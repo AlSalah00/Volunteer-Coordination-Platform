@@ -28,7 +28,7 @@ export default function LocationPicker({ value, onChange }) {
       { location: { lat, lng } },
       (results, status) => {
         if (status === "OK" && results?.length) {
-          onChange(results[0].formatted_address);
+          onChange({ address: results[0].formatted_address, lat, lng });
         }
       },
     );
@@ -101,11 +101,14 @@ function AutocompleteInput({ value, onChange, setCoordinates, setCamera }) {
         const lng = place.geometry.location.lng();
 
         setCoordinates({ lat, lng });
-        onChange(place.formatted_address || "");
+        setCamera((prev) => ({ ...prev, center: { lat, lng } }));
+        onChange({ address: place.formatted_address || "", lat, lng });
       }
     });
     return () => listener.remove();
-  }, [places, onChange, setCoordinates]);
+  }, [places, onChange, setCoordinates, setCamera]);
+
+  const displayAddress = typeof value === "object" ? value?.address : value;
 
   return (
     <input
@@ -113,8 +116,8 @@ function AutocompleteInput({ value, onChange, setCoordinates, setCamera }) {
       id="location"
       name="location"
       type="text"
-      value={value || ""} // Fallback to empty string to prevent controlled/uncontrolled input warnings
-      onChange={(e) => onChange(e.target.value)}
+      value={displayAddress || ""} // Fallback to empty string to prevent controlled/uncontrolled input warnings
+      onChange={(e) => onChange({ address: e.target.value, lat: typeof value === "object" ? value?.lat ?? null : null, lng: typeof value === "object" ? value?.lng ?? null : null })}
       placeholder="Search for an address..."
       className="w-full rounded-md border border-purple-600/20 bg-purple-50/40 px-4 py-2.5
                  font-inter text-sm text-purple-800 placeholder:text-purple-600/40

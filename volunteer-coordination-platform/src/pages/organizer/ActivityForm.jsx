@@ -7,9 +7,12 @@ import ImageUploadField from "../../components/activities/ImageUploadField";
 import LocationPicker from "../../components/activities/LocationPicker";
 import TaskCard from "../../components/activities/TaskCard";
 import StatusBadge from "../../components/activities/StatusBadge";
+import { createActivity } from "../../services/activities";
 
 export default function ActivityForm() {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [details, setDetails] = useState({
     image: null,
@@ -17,37 +20,84 @@ export default function ActivityForm() {
     startsAt: "",
     endsAt: "",
     category: "",
-    location: "",
+    type: "",
+    location: null,
     requirements: "",
   });
 
   const [tasks, setTasks] = useState([]);
 
-  const updateDetail = (field, value) => setDetails((prev) => ({ ...prev, [field]: value }));
+  const updateDetail = (field, value) =>
+    setDetails((prev) => ({ ...prev, [field]: value }));
 
   const addTask = () =>
     setTasks((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), name: "", description: "", capacity: "", level: "any" },
+      {
+        id: crypto.randomUUID(),
+        name: "",
+        description: "",
+        capacity: "",
+        level: "any",
+      },
     ]);
 
   const updateTask = (id, nextTask) =>
     setTasks((prev) => prev.map((t) => (t.id === id ? nextTask : t)));
 
-  const removeTask = (id) => setTasks((prev) => prev.filter((t) => t.id !== id));
+  const removeTask = (id) =>
+    setTasks((prev) => prev.filter((t) => t.id !== id));
 
-  const totalCapacity = tasks.reduce((sum, t) => sum + (Number(t.capacity) || 0), 0);
+  const totalCapacity = tasks.reduce(
+    (sum, t) => sum + (Number(t.capacity) || 0),
+    0,
+  );
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: wire up to Supabase — create the activity row, then the task rows
-    console.log({ details, tasks });
+    setError("");
+
+    if (tasks.length === 0) {
+      setError("Add at least one task before publishing.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { error: submitError } = await createActivity({ details, tasks });
+    setIsSubmitting(false);
+
+    if (submitError) {
+      setError(submitError.message || "Something went wrong while publishing.");
+      return;
+    }
+
+    navigate("/organizer/activities");
   };
+
+  {
+    error && (
+      <div className="mb-6 rounded-md bg-coral-50 border border-coral-600/20 px-4 py-3 text-sm text-coral-600">
+        {error}
+      </div>
+    );
+  }
+
+  <button
+    type="submit"
+    disabled={isSubmitting}
+    className="rounded-md bg-purple-600 px-6 py-2.5 font-sora text-sm font-bold text-purple-50
+             transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer
+             disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+  >
+    {isSubmitting ? "Publishing..." : "Publish Activity"}
+  </button>;
 
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="font-sora text-3xl font-extrabold text-purple-600">New Activity</h1>
+        <h1 className="font-sora text-3xl font-extrabold text-purple-600">
+          New Activity
+        </h1>
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -69,10 +119,15 @@ export default function ActivityForm() {
 
       {/* Details */}
       <section className="mb-8 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <h2 className="mb-6 font-sora text-lg font-extrabold text-purple-600">Details</h2>
+        <h2 className="mb-6 font-sora text-lg font-extrabold text-purple-600">
+          Details
+        </h2>
 
         <div className="flex flex-col gap-6">
-          <ImageUploadField value={details.image} onChange={(file) => updateDetail("image", file)} />
+          <ImageUploadField
+            value={details.image}
+            onChange={(file) => updateDetail("image", file)}
+          />
 
           <FormField
             id="activityName"
@@ -114,7 +169,9 @@ export default function ActivityForm() {
             />
 
             <div className="flex flex-col gap-1.5">
-              <span className="font-inter text-sm font-medium text-purple-600/80">Status</span>
+              <span className="font-inter text-sm font-medium text-purple-600/80">
+                Status
+              </span>
               <div className="flex h-10.5 items-center">
                 <StatusBadge status="upcoming" />
               </div>
@@ -124,7 +181,10 @@ export default function ActivityForm() {
             </div>
           </div>
 
-          <LocationPicker value={details.location} onChange={(val) => updateDetail("location", val)} />
+          <LocationPicker
+            value={details.location}
+            onChange={(locationObj) => setDetails({ ...details, location: locationObj })}
+          />
 
           <TextAreaField
             id="requirements"
@@ -140,7 +200,9 @@ export default function ActivityForm() {
       {/* Tasks */}
       <section className="mb-8 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="font-sora text-lg font-extrabold text-purple-600">Tasks</h2>
+          <h2 className="font-sora text-lg font-extrabold text-purple-600">
+            Tasks
+          </h2>
           <span className="font-inter text-sm text-purple-600/60">
             {totalCapacity} volunteer spot{totalCapacity === 1 ? "" : "s"} total
           </span>
@@ -159,7 +221,8 @@ export default function ActivityForm() {
 
           {tasks.length === 0 && (
             <p className="font-inter text-sm text-purple-600/50">
-              No tasks yet — add at least one so volunteers know what they'll be doing.
+              No tasks yet — add at least one so volunteers know what they'll be
+              doing.
             </p>
           )}
 

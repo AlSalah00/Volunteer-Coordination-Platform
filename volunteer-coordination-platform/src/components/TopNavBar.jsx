@@ -1,17 +1,25 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const links = [
   { label: "How It Works", target: "how-it-works" },
-  { label: "Mission",      target: "mission"       },
+  { label: "Mission",      target: "mission"      },
+  { label: "Login",        href: "/login"         },
 ];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  const handleNavigation = (item) => {
     setMenuOpen(false);
+
+    if (item.href) {
+      navigate(item.href);
+    } else if (item.target) {
+      document.getElementById(item.target)?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -26,7 +34,7 @@ export default function Navbar() {
         {/* Main row */}
         <div className="flex items-center justify-between">
 
-          {/* Wordmark clicks scroll back to top */}
+          {/* Wordmark */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="text-2xl font-semibold text-purple-300
@@ -39,21 +47,21 @@ export default function Navbar() {
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-8">
-            {links.map(({ label, target }) => (
+            {links.map((item) => (
               <button
-                key={target}
-                onClick={() => scrollTo(target)}
+                key={item.label}
+                onClick={() => handleNavigation(item)}
                 className="text-sm font-semibold text-purple-300
                            hover:text-white transition-colors duration-200
                            cursor-pointer"
                 style={{ fontFamily: "'Sora', sans-serif" }}
               >
-                {label}
+                {item.label}
               </button>
             ))}
           </div>
 
-          {/* Mobile animated hamburger / × */}
+          {/* Mobile animated hamburger */}
           <button
             className="md:hidden flex flex-col justify-center gap-1.5
                        w-6 h-6 text-purple-300 hover:text-white
@@ -92,16 +100,16 @@ export default function Navbar() {
             >
               <div className="flex flex-col gap-4 mt-4 pt-4
                               border-t border-purple-300/20 pb-1">
-                {links.map(({ label, target }) => (
+                {links.map((item) => (
                   <button
-                    key={target}
-                    onClick={() => scrollTo(target)}
+                    key={item.label}
+                    onClick={() => handleNavigation(item)}
                     className="text-sm font-semibold text-purple-300
                                hover:text-white transition-colors duration-200
                                text-left cursor-pointer w-fit"
                     style={{ fontFamily: "'Sora', sans-serif" }}
                   >
-                    {label}
+                    {item.label}
                   </button>
                 ))}
               </div>
