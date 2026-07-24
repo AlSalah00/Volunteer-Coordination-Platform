@@ -1,9 +1,25 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImagePlus, X } from "lucide-react";
 
-export default function ImageUploadField({ value, onChange, label = "Activity Photo" }) {
+/**
+ * onChange receives:
+ *   - a File when a new photo is chosen
+ *   - null when the existing photo is explicitly removed
+ *   - never called at all if nothing changes (parent keeps the existing one)
+ */
+
+export default function ImageUploadField({
+  initialImageUrl = null,
+  onChange,
+  label = "Activity Photo",
+}) {
   const inputRef = useRef(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(initialImageUrl);
+
+  // Keeps the preview in sync if the activity finishes loading after mount.
+  useEffect(() => {
+    setPreviewUrl(initialImageUrl);
+  }, [initialImageUrl]);
 
   const handleFile = (file) => {
     if (!file) return;
@@ -61,7 +77,7 @@ export default function ImageUploadField({ value, onChange, label = "Activity Ph
       </div>
 
       <p className="font-inter text-xs text-purple-600/50">
-        Best at 1200×800px (3:2), JPG or PNG, under 5MB. No photo? We'll use a friendly default.
+        Best at 1200×800px (3:2), JPG or PNG, under 5MB. No photo? We'll use a default.
       </p>
     </div>
   );

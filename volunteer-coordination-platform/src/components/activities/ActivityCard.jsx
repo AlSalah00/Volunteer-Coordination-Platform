@@ -8,27 +8,20 @@ import {
   UserCheck,
 } from "lucide-react";
 import StatusBadge from "./StatusBadge";
+import { formatDateTime } from "../../utils/activities";
 import defaultActivityImage from "../../assets/defaultActivityImage.svg";
 
-function formatDateTime(dateInput) {
-  const date = new Date(dateInput);
-  const dateLabel = date.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-  const timeLabel = date.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-  return `${dateLabel} · ${timeLabel}`;
-}
-
 function ActionIcon({ icon: Icon, label, onClick }) {
+  // Stops the click from bubbling up to the card's own onClick.
+  const handleClick = (e) => {
+    e.stopPropagation();
+    onClick?.(e);
+  };
+
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
       aria-label={label}
       className="group relative flex h-9 w-9 items-center justify-center rounded-full bg-purple-50 text-purple-600
                  transition-colors hover:bg-purple-600 hover:text-purple-50 cursor-pointer"
@@ -55,6 +48,7 @@ export default function ActivityCard({
   shortLocation,
   volunteersFilled,
   volunteersCapacity,
+  onClick,
   onEdit,
   onTrack,
   onViewApplicants,
@@ -67,8 +61,17 @@ export default function ActivityCard({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.(e);
+        }
+      }}
       className="flex overflow-hidden rounded-2xl border border-purple-200/60 bg-white shadow-sm
-                 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
     >
       {/* Image, clipped flush to the card edge */}
       <div className="w-36 shrink-0 sm:w-44">

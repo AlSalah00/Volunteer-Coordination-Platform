@@ -2,6 +2,10 @@ import { supabase } from "../lib/supabaseClient";
 
 const ACTIVITY_IMAGE_BUCKET = "activity-images";
 
+export async function getActivityById(id) {
+  return supabase.from("activities").select("*, activity_tasks(*)").eq("id", id).single();
+}
+
 export async function getOrganizerActivities() {
   const {
     data: { user },
@@ -31,6 +35,24 @@ async function uploadActivityImage(file, organizerId) {
 
   const { data } = supabase.storage.from(ACTIVITY_IMAGE_BUCKET).getPublicUrl(filePath);
   return { url: data.publicUrl, error: null };
+}
+
+function buildLocationFields(details) {
+  if (details.activityType === "online") {
+    return {
+      online_platform: details.onlinePlatform || null,
+      location_name: null,
+      latitude: null,
+      longitude: null,
+    };
+  }
+ 
+  return {
+    online_platform: null,
+    location_name: details.location?.address ?? details.location ?? null,
+    latitude: details.location?.lat ?? null,
+    longitude: details.location?.lng ?? null,
+  };
 }
 
 export async function createActivity({ details, tasks }) {
@@ -88,4 +110,69 @@ export async function createActivity({ details, tasks }) {
   }
 
   return { data: activity, error: null };
+}
+
+export async function updateActivity(id, { details, tasks }) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+ 
+  if (userError || !user) {
+    return { data: null, error: userError ?? new Error("Not signed in.") };
+  }
+ 
+  let imageUrl = details.existingImageUrl ?? null;
+  if (details.image === null) {
+    imageUrl = null;
+  } else if (details.image instanceof File) {
+    const { url, error: uploadError } = await uploadActivityImage(details.image, user.id);
+    if (uploadError) return { data: null, error: uploadError };
+    imageUrl = url;
+  }
+ 
+  const { data: activity, error: activityError } = await supabase
+    .from("activities")
+    .update({
+      name: details.name,
+      image_url: imageUrl,
+      starts_at: details.startsAt,
+      ends_at: details.endsAt,
+      category: details.category,
+      activity_type: details.activityType,
+      requirements: details.requirements || null,
+      ...buildLocationFields(details),
+    })
+    .eq("id", id)
+    .select()
+    .single();
+ 
+  if (activityError) return { data: null, error: activityError };
+ 
+  const { error: deleteTasksError } = await supabase
+    .from("activity_tasks")
+    .delete()
+    .eq("activity_id", id);
+ 
+  if (deleteTasksError) return { data: null, error: deleteTasksError };
+ 
+  if (tasks.length > 0) {
+    const taskRows = tasks.map((task) => ({
+      activity_id: id,
+      name: task.name,
+      description: task.description || null,
+      capacity: Number(task.capacity),
+      level: task.level,
+    }));
+ 
+    const { error: tasksError } = await supabase.from("activity_tasks").insert(taskRows);
+    if (tasksError) return { data: null, error: tasksError };
+  }
+ 
+  return { data: activity, error: null };
+}
+ 
+// Note this doesn't delete the uploaded photo from Supabase storage.
+export async function deleteActivity(id) {
+  return supabase.from("activities").delete().eq("id", id);
 }

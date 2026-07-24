@@ -10,6 +10,7 @@ import OrganizerLayout from "../components/organizer/OrganizerLayout";
 import Dashboard from "../pages/organizer/Dashboard";
 import Activities from "../pages/organizer/Activities";
 import ActivityForm from "../pages/organizer/ActivityForm";
+import ActivityDetails from "../pages/organizer/ActivityDetails";
 import Recruit from "../pages/organizer/Recruit";
 import Reviews from "../pages/organizer/Reviews";
 import OrgProfile from "../pages/organizer/OrgProfile";
@@ -45,6 +46,8 @@ export default function AppRoutes() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="activities" element={<Activities />} />
         <Route path="activities/new" element={<ActivityForm />} />
+        <Route path="activities/:id" element={<ActivityDetails />} />
+        <Route path="activities/:id/edit" element={<ActivityForm />} />
         <Route path="recruit" element={<Recruit />} />
         <Route path="reviews" element={<Reviews />} />
         <Route path="profile" element={<OrgProfile />} />

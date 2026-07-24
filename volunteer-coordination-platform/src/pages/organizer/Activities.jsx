@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ActivityCard from "../../components/activities/ActivityCard";
 import { getOrganizerActivities } from "../../services/activities";
 import { mapActivityToCard } from "../../utils/activities";
 
 export default function Activities() {
+  const navigate = useNavigate();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -36,7 +38,8 @@ export default function Activities() {
         </h1>
         <Link
           to="new"
-          className="rounded-lg bg-purple-600 px-4 py-2 font-inter text-sm font-semibold text-white transition hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          className="flex items-center gap-2 rounded-md bg-purple-600 px-5 py-2.5 font-sora text-sm font-bold text-purple-50
+                     transition-all duration-200 hover:bg-purple-800 active:scale-95"
         >
           + Create Activity
         </Link>
@@ -65,7 +68,8 @@ export default function Activities() {
           <ActivityCard
             key={activity.id}
             {...activity}
-            onEdit={() => console.log("edit", activity.id)}
+            onClick={() => navigate(`/organizer/activities/${activity.id}`)}
+            onEdit={() => navigate(`/organizer/activities/${activity.id}/edit`)}
             onTrack={() => console.log("track", activity.id)}
             onViewApplicants={() => console.log("applicants", activity.id)}
           />
