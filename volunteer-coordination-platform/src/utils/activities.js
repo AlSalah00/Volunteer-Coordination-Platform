@@ -1,6 +1,16 @@
+// Helper to safely parse strings across all browsers (including Safari)
+function parseDate(input) {
+  if (!input) return null;
+  if (input instanceof Date) return input;
+  const normalized = typeof input === "string" ? input.replace(" ", "T") : input;
+  const date = new Date(normalized);
+  return isNaN(date.getTime()) ? null : date;
+}
+
 export function toDatetimeLocal(isoString) {
-  if (!isoString) return "";
-  const date = new Date(isoString);
+  const date = parseDate(isoString);
+  if (!date) return "";
+  
   const pad = (n) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
     date.getHours()
@@ -8,7 +18,9 @@ export function toDatetimeLocal(isoString) {
 }
 
 export function formatDateTime(dateInput) {
-  const date = new Date(dateInput);
+  const date = parseDate(dateInput);
+  if (!date) return "";
+
   const dateLabel = date.toLocaleDateString(undefined, {
     weekday: "short",
     month: "short",
@@ -22,14 +34,11 @@ export function formatDateTime(dateInput) {
 }
 
 export function formatDateRange(startInput, endInput) {
-  const start = new Date(startInput);
-  const end = new Date(endInput);
+  const start = parseDate(startInput);
+  const end = parseDate(endInput);
+  if (!start) return "";
 
   const startTime = start.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-  const endTime = end.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -37,6 +46,15 @@ export function formatDateRange(startInput, endInput) {
     weekday: "short",
     month: "short",
     day: "numeric",
+  });
+
+  if (!end) {
+    return `${startDateLabel} · ${startTime}`;
+  }
+
+  const endTime = end.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
   });
 
   if (start.toDateString() === end.toDateString()) {
