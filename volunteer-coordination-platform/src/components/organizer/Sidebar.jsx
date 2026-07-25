@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -18,6 +19,7 @@ const navItems = [
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const navigate = useNavigate();
 
   const organization = {
     name: "Green Sprouts Initiative",
@@ -58,7 +60,7 @@ export default function Sidebar() {
 
 
       <button
-        onClick={() => console.log("Navigate to settings/profile")}
+        onClick={() => navigate("/organizer/profile")}
         className="flex items-center gap-3 p-2 rounded-2xl hover:bg-purple-800/40 text-left transition-colors mb-6 group cursor-pointer focus:outline-none"
       >
         <img
