@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import Navbar from "../components/TopNavBar";
-import HeroSection from "../components/HeroSection";
-import HowItWorks from "../components/HowItWorks";
-import Mission from "../components/Mission";
-import Footer from "../components/Footer";
+import Navbar from "../components/landing_page/TopNavBar";
+import HeroSection from "../components/landing_page/HeroSection";
+import HowItWorks from "../components/landing_page/HowItWorks";
+import Mission from "../components/landing_page/Mission";
+import Footer from "../components/landing_page/Footer";
 
 export default function LandingPage() {
   return (

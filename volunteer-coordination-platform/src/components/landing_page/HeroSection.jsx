@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import heroBg from "../assets/heroBg.svg";
-import heart1 from "../assets/heart1.svg";
-import heart2 from "../assets/heart2.svg";
-import heart3 from "../assets/heart3.svg";
+import heroBg from "../../assets/heroBg.svg";
+import heart1 from "../../assets/heart1.svg";
+import heart2 from "../../assets/heart2.svg";
+import heart3 from "../../assets/heart3.svg";
 
 const hearts = [
   {

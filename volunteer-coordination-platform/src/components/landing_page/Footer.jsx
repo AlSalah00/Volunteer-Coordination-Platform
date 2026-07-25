@@ -1,6 +1,6 @@
-import InstagramIcon from "../assets/instagram.svg?react";
-import LinkedInIcon  from "../assets/linkedin.svg?react";
-import XIcon         from "../assets/x.svg?react";
+import InstagramIcon from "../../assets/instagram.svg?react";
+import LinkedInIcon  from "../../assets/linkedin.svg?react";
+import XIcon         from "../../assets/x.svg?react";
 
 const socials = [
   { icon: XIcon,         label: "X",         href: "#" },

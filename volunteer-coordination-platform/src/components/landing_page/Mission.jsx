@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Handshake } from "lucide-react";
-import SDGImg from "../assets/SDG17.jpg";
+import SDGImg from "../../assets/SDG17.jpg";
 
 export default function Mission() {
   return (

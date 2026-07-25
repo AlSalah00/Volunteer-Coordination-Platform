@@ -70,7 +70,7 @@ export default function Activities() {
             {...activity}
             onClick={() => navigate(`/organizer/activities/${activity.id}`)}
             onEdit={() => navigate(`/organizer/activities/${activity.id}/edit`)}
-            onTrack={() => console.log("track", activity.id)}
+            onTrack={() => navigate(`/organizer/activities/${activity.id}/track`)}
             onViewApplicants={() => console.log("applicants", activity.id)}
           />
         ))}

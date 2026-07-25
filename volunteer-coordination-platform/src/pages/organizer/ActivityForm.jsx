@@ -3,13 +3,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import FormField from "../../components/common/FormField";
 import TextAreaField from "../../components/common/TextAreaField";
+import ConfirmModal from "../../components/common/ConfirmModal";
 import ImageUploadField from "../../components/activities/ImageUploadField";
 import LocationPicker from "../../components/activities/LocationPicker";
 import ActivityTypeToggle from "../../components/activities/ActivityTypeToggle";
 import TaskCard from "../../components/activities/TaskCard";
 import StatusBadge from "../../components/activities/StatusBadge";
-import { createActivity, updateActivity, deleteActivity, getActivityById } from "../../services/activities";
+import {
+  createActivity,
+  updateActivity,
+  deleteActivity,
+  getActivityById,
+} from "../../services/activities";
 import { toDatetimeLocal } from "../../utils/activities";
+import { useToast } from "../../contexts/ToastContext";
 
 const emptyDetails = {
   image: undefined, // undefined = unchanged, File = new upload, null = removed
@@ -29,12 +36,14 @@ export default function ActivityForm() {
   const { id } = useParams();
   const isEditMode = Boolean(id);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [details, setDetails] = useState(emptyDetails);
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(isEditMode);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -61,7 +70,11 @@ export default function ActivityForm() {
         status: data.status,
         activityType: data.activity_type,
         location: data.location_name
-          ? { address: data.location_name, lat: data.latitude, lng: data.longitude }
+          ? {
+              address: data.location_name,
+              lat: data.latitude,
+              lng: data.longitude,
+            }
           : "",
         onlinePlatform: data.online_platform || "",
         requirements: data.requirements || "",
@@ -74,7 +87,7 @@ export default function ActivityForm() {
           description: task.description || "",
           capacity: String(task.capacity),
           level: task.level,
-        }))
+        })),
       );
 
       setIsLoading(false);
@@ -85,20 +98,31 @@ export default function ActivityForm() {
     };
   }, [id, isEditMode]);
 
-  const updateDetail = (field, value) => setDetails((prev) => ({ ...prev, [field]: value }));
+  const updateDetail = (field, value) =>
+    setDetails((prev) => ({ ...prev, [field]: value }));
 
   const addTask = () =>
     setTasks((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), name: "", description: "", capacity: "", level: "any" },
+      {
+        id: crypto.randomUUID(),
+        name: "",
+        description: "",
+        capacity: "",
+        level: "any",
+      },
     ]);
 
   const updateTask = (taskId, nextTask) =>
     setTasks((prev) => prev.map((t) => (t.id === taskId ? nextTask : t)));
 
-  const removeTask = (taskId) => setTasks((prev) => prev.filter((t) => t.id !== taskId));
+  const removeTask = (taskId) =>
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
 
-  const totalCapacity = tasks.reduce((sum, t) => sum + (Number(t.capacity) || 0), 0);
+  const totalCapacity = tasks.reduce(
+    (sum, t) => sum + (Number(t.capacity) || 0),
+    0,
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -120,27 +144,39 @@ export default function ActivityForm() {
       return;
     }
 
-    navigate(isEditMode ? `/organizer/activities/${id}` : "/organizer/activities");
+
+    showToast({
+      type: "success",
+      message: isEditMode ? "Activity details updated." : "Activity published!",
+    });
+
+    navigate(
+      isEditMode ? `/organizer/activities/${id}` : "/organizer/activities",
+    );
   };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm("Delete this activity? This can't be undone.");
-    if (!confirmed) return;
-
     setIsDeleting(true);
     const { error: deleteError } = await deleteActivity(id);
     setIsDeleting(false);
 
     if (deleteError) {
       setError(deleteError.message || "Couldn't delete this activity.");
+      setShowDeleteModal(false);
       return;
     }
+
+    showToast({ type: "success", message: "Activity deleted." });
 
     navigate("/organizer/activities");
   };
 
   if (isLoading) {
-    return <p className="font-inter text-sm text-purple-600/60">Loading activity...</p>;
+    return (
+      <p className="font-inter text-sm text-purple-600/60">
+        Loading activity...
+      </p>
+    );
   }
 
   return (
@@ -162,7 +198,7 @@ export default function ActivityForm() {
           {isEditMode && (
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteModal(true)}
               disabled={isDeleting}
               className="rounded-md px-5 py-2.5 font-sora text-sm font-bold text-coral-600
                          transition-colors hover:bg-coral-50 cursor-pointer
@@ -198,7 +234,9 @@ export default function ActivityForm() {
 
       {/* Details */}
       <section className="mb-8 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <h2 className="mb-6 font-sora text-lg font-extrabold text-purple-600">Details</h2>
+        <h2 className="mb-6 font-sora text-lg font-extrabold text-purple-600">
+          Details
+        </h2>
 
         <div className="flex flex-col gap-6">
           <ImageUploadField
@@ -246,7 +284,9 @@ export default function ActivityForm() {
             />
 
             <div className="flex flex-col gap-1.5">
-              <span className="font-inter text-sm font-medium text-purple-600/80">Status</span>
+              <span className="font-inter text-sm font-medium text-purple-600/80">
+                Status
+              </span>
               <div className="flex h-10.5 items-center">
                 <StatusBadge status={details.status} />
               </div>
@@ -293,7 +333,9 @@ export default function ActivityForm() {
       {/* Tasks */}
       <section className="mb-8 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="font-sora text-lg font-extrabold text-purple-600">Tasks</h2>
+          <h2 className="font-sora text-lg font-extrabold text-purple-600">
+            Tasks
+          </h2>
           <span className="font-inter text-sm text-purple-600/60">
             {totalCapacity} volunteer spot{totalCapacity === 1 ? "" : "s"} total
           </span>
@@ -312,7 +354,8 @@ export default function ActivityForm() {
 
           {tasks.length === 0 && (
             <p className="font-inter text-sm text-purple-600/50">
-              No tasks yet — add at least one so volunteers know what they'll be doing.
+              No tasks yet. Add at least one so volunteers know what they'll be
+              doing.
             </p>
           )}
 
@@ -327,6 +370,17 @@ export default function ActivityForm() {
           </button>
         </div>
       </section>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        variant="danger"
+        title="Delete this activity?"
+        description="This can't be undone. The activity and all its tasks will be permanently removed."
+        confirmLabel="Delete Activity"
+        isLoading={isDeleting}
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </form>
   );
 }
