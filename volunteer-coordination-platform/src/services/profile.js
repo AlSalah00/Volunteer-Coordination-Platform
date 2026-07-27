@@ -1,5 +1,59 @@
 import { supabase } from "../lib/supabaseClient";
 
+async function uploadAvatar(file, userId) {
+  const fileExt = file.name.split(".").pop();
+  const filePath = `${userId}/${crypto.randomUUID()}.${fileExt}`;
+ 
+  const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file);
+  if (uploadError) return { url: null, error: uploadError };
+ 
+  const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
+  return { url: data.publicUrl, error: null };
+}
+ 
+export async function updateOrganizerProfile({
+  orgName,
+  bio,
+  address,
+  contactNumber,
+  avatar,
+  existingAvatarUrl,
+}) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+ 
+  if (userError || !user) {
+    return { data: null, error: userError ?? new Error("Not signed in.") };
+  }
+ 
+  let avatarUrl = existingAvatarUrl ?? null;
+  if (avatar === null) {
+    avatarUrl = null;
+  } else if (avatar instanceof File) {
+    const { url, error: uploadError } = await uploadAvatar(avatar, user.id);
+    if (uploadError) return { data: null, error: uploadError };
+    avatarUrl = url;
+  }
+ 
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ avatar_url: avatarUrl, bio: bio || null, contact_number: contactNumber || null })
+    .eq("id", user.id);
+ 
+  if (profileError) return { data: null, error: profileError };
+ 
+  const { error: orgError } = await supabase
+    .from("organizer_profiles")
+    .update({ org_name: orgName, address: address || null })
+    .eq("profile_id", user.id);
+ 
+  if (orgError) return { data: null, error: orgError };
+ 
+  return { data: true, error: null };
+}
+
 export async function getOrganizerProfile() {
   const {
     data: { user },

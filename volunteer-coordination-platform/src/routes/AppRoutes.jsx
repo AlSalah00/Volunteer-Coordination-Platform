@@ -15,6 +15,7 @@ import ActivityTracking from "../pages/organizer/ActivityTracking";
 import Recruit from "../pages/organizer/Recruit";
 import Reviews from "../pages/organizer/Reviews";
 import OrgProfile from "../pages/organizer/OrgProfile";
+import OrgProfileEdit from "../pages/organizer/OrgProfileEdit";
 
 export default function AppRoutes() {
   return (
@@ -53,6 +54,7 @@ export default function AppRoutes() {
         <Route path="recruit" element={<Recruit />} />
         <Route path="reviews" element={<Reviews />} />
         <Route path="profile" element={<OrgProfile />} />
+        <Route path="profile/edit" element={<OrgProfileEdit />} />
       </Route> 
     </Routes>
   );

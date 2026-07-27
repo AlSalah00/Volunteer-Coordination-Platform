@@ -1,10 +1,24 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Phone, MapPin, Hash, Star, Pencil, KeyRound, Trash2, BadgeCheck } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Hash,
+  Star,
+  Pencil,
+  KeyRound,
+  Trash2,
+  BadgeCheck,
+} from "lucide-react";
 import Avatar from "../../components/common/Avatar";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import { getOrganizerProfile } from "../../services/profile";
-import { sendPasswordResetEmail } from "../../services/auth";
+import {
+  sendPasswordResetEmail,
+  deleteAccount,
+  signOut,
+} from "../../services/auth";
 import { useToast } from "../../contexts/ToastContext";
 
 function InfoRow({ icon: Icon, label }) {
@@ -27,6 +41,7 @@ export default function OrgProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [isSendingReset, setIsSendingReset] = useState(false);
 
   useEffect(() => {
@@ -50,7 +65,10 @@ export default function OrgProfile() {
 
   const handleResetPassword = async () => {
     if (!profile?.email) {
-      showToast({ type: "error", message: "No email address associated with this profile." });
+      showToast({
+        type: "error",
+        message: "No email address associated with this profile.",
+      });
       return;
     }
 
@@ -60,14 +78,30 @@ export default function OrgProfile() {
 
     showToast(
       resetError
-        ? { type: "error", message: "Couldn't send the reset email. Try again." }
-        : { type: "success", message: "Password reset email sent." }
+        ? {
+            type: "error",
+            message: "Couldn't send the reset email. Try again.",
+          }
+        : { type: "success", message: "Password reset email sent." },
     );
   };
 
   const handleDeleteAccount = async () => {
-    setShowDeleteModal(false);
-    showToast({ type: "error", message: "Account deletion isn't wired up yet." });
+    setIsDeletingAccount(true);
+    const { error: deleteError } = await deleteAccount();
+
+    if (deleteError) {
+      setIsDeletingAccount(false);
+      setShowDeleteModal(false);
+      showToast({
+        type: "error",
+        message: "Couldn't delete your account. Try again.",
+      });
+      return;
+    }
+
+    await signOut();
+    navigate("/");
   };
 
   if (loading) {
@@ -77,7 +111,7 @@ export default function OrgProfile() {
   if (error || !profile) {
     return (
       <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
-        {error || "Profile not found."}
+        {error || "Oh no! We couldn't find your profile."}
       </div>
     );
   }
@@ -126,7 +160,9 @@ export default function OrgProfile() {
                 </span>
               </span>
             ) : (
-              <span className="font-inter text-sm text-purple-600/50">No ratings yet</span>
+              <span className="font-inter text-sm text-purple-600/50">
+                No ratings yet
+              </span>
             )}
           </div>
 
@@ -165,20 +201,31 @@ export default function OrgProfile() {
       {/* Bio */}
       {profile.bio && (
         <section className="mb-6 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-          <h2 className="mb-3 font-sora text-lg font-extrabold text-purple-600">About</h2>
-          <p className="font-inter text-sm leading-relaxed text-purple-600/70">{profile.bio}</p>
+          <h2 className="mb-3 font-sora text-lg font-extrabold text-purple-600">
+            About
+          </h2>
+          <p className="font-inter text-sm leading-relaxed text-purple-600/70">
+            {profile.bio}
+          </p>
         </section>
       )}
 
       {/* Contact info */}
       <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <h2 className="mb-5 font-sora text-lg font-extrabold text-purple-600">Contact Info</h2>
+        <h2 className="mb-5 font-sora text-lg font-extrabold text-purple-600">
+          Contact Info
+        </h2>
         <div className="flex flex-col gap-4">
           <InfoRow icon={Mail} label={profile.email} />
-          {profile.contact_number && <InfoRow icon={Phone} label={profile.contact_number} />}
+          {profile.contact_number && (
+            <InfoRow icon={Phone} label={profile.contact_number} />
+          )}
           {profile.address && <InfoRow icon={MapPin} label={profile.address} />}
           {profile.registration_number && (
-            <InfoRow icon={Hash} label={`Reg. No. ${profile.registration_number}`} />
+            <InfoRow
+              icon={Hash}
+              label={`Reg. No. ${profile.registration_number}`}
+            />
           )}
         </div>
       </section>
@@ -189,6 +236,7 @@ export default function OrgProfile() {
         title="Delete your account?"
         description="This permanently deletes your organization profile and everything tied to it. This can't be undone."
         confirmLabel="Delete Account"
+        isLoading={isDeletingAccount}
         onConfirm={handleDeleteAccount}
         onCancel={() => setShowDeleteModal(false)}
       />

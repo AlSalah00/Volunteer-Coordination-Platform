@@ -58,6 +58,10 @@ export async function sendPasswordResetEmail(email) {
   });
 }
 
+export async function deleteAccount() {
+  return supabase.functions.invoke("delete-account");
+}
+
 export async function signOut() {
   return supabase.auth.signOut();
 }
