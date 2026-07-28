@@ -27,9 +27,9 @@ export default function OrganizerLayout() {
 
   return (
     <div className="min-h-screen w-full bg-purple-50 flex">
-      <Sidebar />
+      <Sidebar organizerProfile={organizerProfile}/>
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex pt-20 flex-col min-w-0">
         {!loadingProfile && !isVerified && <VerificationBanner />}
 
         <main className="flex-1 p-6 lg:p-10">

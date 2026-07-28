@@ -4,6 +4,7 @@ import PublicRoute from "../components/routing/PublicRoute";
 import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import SignUpPage from "../pages/SignUpPage";
+import ResetPassword from "../pages/ResetPassword";
 import VolunteerHomepage from "../pages/VolunteerHomepage";
 import AuthCallback from "../pages/AuthCallback";
 import OrganizerLayout from "../components/organizer/OrganizerLayout";
@@ -23,6 +24,7 @@ export default function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
 
       <Route

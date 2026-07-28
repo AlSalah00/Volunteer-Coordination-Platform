@@ -63,7 +63,8 @@ export default function OrgProfile() {
     };
   }, []);
 
-  const handleResetPassword = async () => {
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
     if (!profile?.email) {
       showToast({
         type: "error",
