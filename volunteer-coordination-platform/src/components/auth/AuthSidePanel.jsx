@@ -27,7 +27,9 @@ export default function AuthSidePanel({
 
       {/* Wordmark */}
       <div className="relative z-10 font-fredoka text-2xl font-semibold text-purple-50 tracking-wide">
-        Benevolentia
+        <Link to="/" className="hover:text-purple-100 transition-colors">
+          Benevolentia
+        </Link>
       </div>
 
       {/* Headline / subtext, sits in the empty middle space */}

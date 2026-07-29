@@ -23,6 +23,36 @@ export async function getOrganizerActivities() {
     .order("starts_at", { ascending: true });
 }
 
+export async function getPublicActivities() {
+  return supabase
+    .from("activities")
+    .select("*, activity_tasks(capacity)")
+    .eq("status", "upcoming")
+    .order("starts_at", { ascending: true });
+}
+
+export async function getPublicActivityById(id) {
+  const { data, error } = await supabase
+    .from("activities")
+    .select("*, activity_tasks(*), profiles(avatar_url, organizer_profiles(org_name))")
+    .eq("id", id)
+    .single();
+
+  if (error) return { data: null, error };
+
+  const rawOrg = data.profiles?.organizer_profiles;
+  const orgProfile = Array.isArray(rawOrg) ? rawOrg[0] : rawOrg;
+
+  return {
+    data: {
+      ...data,
+      organizer_name: orgProfile?.org_name ?? "Organizer",
+      organizer_avatar_url: data.profiles?.avatar_url ?? null,
+    },
+    error: null,
+  };
+}
+
 async function uploadActivityImage(file, organizerId) {
   const fileExt = file.name.split(".").pop();
   const filePath = `${organizerId}/${crypto.randomUUID()}.${fileExt}`;

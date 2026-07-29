@@ -122,7 +122,7 @@ export default function HeroSection() {
               </button>
             </Link>
 
-            <Link to="/activities">
+            <Link to="/explore">
               <button
                 className="px-6 py-3 rounded-md text-sm font-bold border-2 border-purple-600 text-purple-600 font-sora bg-transparent
                            transition-all duration-200 hover:bg-purple-50

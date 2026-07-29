@@ -1,18 +1,11 @@
-import {
-  Calendar,
-  MapPin,
-  Globe,
-  Users,
-  Pencil,
-  ClipboardCheck,
-  UserCheck,
-} from "lucide-react";
+import { Calendar, MapPin, Globe, Users, Pencil, ClipboardCheck, UserCheck } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import { formatDateTime } from "../../utils/activities";
+// Adjust this path/filename to match your actual asset:
 import defaultActivityImage from "../../assets/defaultActivityImage.svg";
 
 function ActionIcon({ icon: Icon, label, onClick }) {
-  // Stops the click from bubbling up to the card's own onClick.
+  // Stops the click from bubbling up to the card's own onClick
   const handleClick = (e) => {
     e.stopPropagation();
     onClick?.(e);
@@ -48,11 +41,14 @@ export default function ActivityCard({
   shortLocation,
   volunteersFilled,
   volunteersCapacity,
+  variant = "organizer",
   onClick,
   onEdit,
   onTrack,
   onViewApplicants,
+  onApply,
 }) {
+
   const hasFilledCount = volunteersFilled != null;
   const fillPercent =
     hasFilledCount && volunteersCapacity
@@ -75,20 +71,14 @@ export default function ActivityCard({
     >
       {/* Image, clipped flush to the card edge */}
       <div className="w-36 shrink-0 sm:w-44">
-        <img
-          src={image || defaultActivityImage}
-          alt=""
-          className="h-full w-full object-cover"
-        />
+        <img src={image || defaultActivityImage} alt="" className="h-full w-full object-cover" />
       </div>
 
       {/* Details */}
       <div className="flex min-w-0 flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="truncate font-sora text-base font-bold text-purple-600">
-              {title}
-            </h3>
+            <h3 className="truncate font-sora text-base font-bold text-purple-600">{title}</h3>
             <div className="mt-1 flex items-center gap-1.5 font-inter text-xs text-purple-600/60">
               <Calendar className="h-3.5 w-3.5" />
               {formatDateTime(date)}
@@ -98,33 +88,19 @@ export default function ActivityCard({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* Category Tag */}
-          {category && (
-            <span className="rounded-full bg-purple-50 px-2.5 py-1 font-sora text-xs font-bold text-purple-600">
-              {category}
-            </span>
-          )}
-
-          {/* Type Tag */}
-          {type && (
-            <span className="rounded-full bg-purple-50 px-2.5 py-1 font-sora text-xs font-bold text-purple-600">
-              {type.replace("-", " ")}
-            </span>
-          )}
-
-          {/* Location / Online Details */}
+          <span className="rounded-full bg-purple-50 px-2.5 py-1 font-sora text-xs font-bold text-purple-600">
+            {category}
+          </span>
           {type === "online" ? (
             <span className="flex items-center gap-1 font-inter text-xs text-purple-600/60">
               <Globe className="h-3.5 w-3.5" />
               Online
             </span>
           ) : (
-            shortLocation && (
-              <span className="flex items-center gap-1 font-inter text-xs text-purple-600/60">
-                <MapPin className="h-3.5 w-3.5" />
-                {shortLocation}
-              </span>
-            )
+            <span className="flex items-center gap-1 font-inter text-xs text-purple-600/60">
+              <MapPin className="h-3.5 w-3.5" />
+              {shortLocation}
+            </span>
           )}
         </div>
 
@@ -145,15 +121,27 @@ export default function ActivityCard({
           )}
         </div>
 
-        <div className="mt-auto flex items-center gap-2 pt-1">
-          <ActionIcon icon={Pencil} label="Edit" onClick={onEdit} />
-          <ActionIcon icon={ClipboardCheck} label="Track" onClick={onTrack} />
-          <ActionIcon
-            icon={UserCheck}
-            label="Applicants"
-            onClick={onViewApplicants}
-          />
-        </div>
+        {variant === "volunteer" ? (
+          <div className="mt-auto pt-1">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onApply?.();
+              }}
+              className="w-full rounded-md bg-purple-600 py-2.5 font-sora text-sm font-bold text-purple-50
+                         transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer"
+            >
+              Count Me In
+            </button>
+          </div>
+        ) : (
+          <div className="mt-auto flex items-center gap-2 pt-1">
+            <ActionIcon icon={Pencil} label="Edit" onClick={onEdit} />
+            <ActionIcon icon={ClipboardCheck} label="Track" onClick={onTrack} />
+            <ActionIcon icon={UserCheck} label="Applicants" onClick={onViewApplicants} />
+          </div>
+        )}
       </div>
     </div>
   );
