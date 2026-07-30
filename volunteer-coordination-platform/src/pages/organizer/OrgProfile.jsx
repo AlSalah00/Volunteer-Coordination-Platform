@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import {
   Mail,
   Phone,
@@ -13,7 +14,6 @@ import {
 } from "lucide-react";
 import Avatar from "../../components/common/Avatar";
 import ConfirmModal from "../../components/common/ConfirmModal";
-import { getOrganizerProfile } from "../../services/profile";
 import {
   sendPasswordResetEmail,
   deleteAccount,
@@ -37,35 +37,25 @@ export default function OrgProfile() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [isSendingReset, setIsSendingReset] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
+  const { organizerProfile, isVerified, loadingProfile, refetchProfile } =
+    useOutletContext();
 
-    getOrganizerProfile().then(({ data, error: fetchError }) => {
-      if (!isMounted) return;
-
-      if (fetchError) {
-        setError(fetchError.message || "Couldn't load your profile.");
-      } else {
-        setProfile(data);
-      }
-      setLoading(false);
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  if (loadingProfile) {
+    return (
+      <p className="font-inter text-sm text-purple-600/60">
+        Loading profile...
+      </p>
+    );
+  }
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (!profile?.email) {
+    if (!organizerProfile?.email) {
       showToast({
         type: "error",
         message: "No email address associated with this profile.",
@@ -74,7 +64,7 @@ export default function OrgProfile() {
     }
 
     setIsSendingReset(true);
-    const { error: resetError } = await sendPasswordResetEmail(profile.email);
+    const { error: resetError } = await sendPasswordResetEmail(organizerProfile.email);
     setIsSendingReset(false);
 
     showToast(
@@ -105,19 +95,13 @@ export default function OrgProfile() {
     navigate("/");
   };
 
-  if (loading) {
-    return <p className="font-inter text-sm text-purple-600/60">Loading...</p>;
-  }
-
-  if (error || !profile) {
+  if (error || !organizerProfile) {
     return (
       <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
         {error || "Oh no! We couldn't find your profile."}
       </div>
     );
   }
-
-  const isVerified = profile.verification_status === "verified";
 
   return (
     <div className="max-w-3xl">
@@ -133,8 +117,8 @@ export default function OrgProfile() {
 
         <div className="absolute left-8 top-24">
           <Avatar
-            src={profile.avatar_url}
-            name={profile.org_name}
+            src={organizerProfile?.avatar_url}
+            name={organizerProfile?.org_name}
             size={112}
             className="border-4 border-white shadow-md"
           />
@@ -143,7 +127,7 @@ export default function OrgProfile() {
         <div className="px-8 pb-6 pt-4 sm:pl-40">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="font-sora text-2xl font-extrabold text-purple-600">
-              {profile.org_name}
+              {organizerProfile?.org_name}
             </h1>
             {isVerified && (
               <span title="Verified organization">
@@ -153,11 +137,11 @@ export default function OrgProfile() {
           </div>
 
           <div className="mt-1.5">
-            {profile.average_rating != null ? (
+            {organizerProfile?.average_rating != null ? (
               <span className="flex items-center gap-1.5 font-inter text-sm text-purple-600/80">
                 <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                 <span className="font-sora font-bold text-purple-600">
-                  {profile.average_rating.toFixed(1)}
+                  {organizerProfile.average_rating.toFixed(1)}
                 </span>
               </span>
             ) : (
@@ -200,13 +184,13 @@ export default function OrgProfile() {
       </div>
 
       {/* Bio */}
-      {profile.bio && (
+      {organizerProfile?.bio && (
         <section className="mb-6 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
           <h2 className="mb-3 font-sora text-lg font-extrabold text-purple-600">
             About
           </h2>
           <p className="font-inter text-sm leading-relaxed text-purple-600/70">
-            {profile.bio}
+            {organizerProfile.bio}
           </p>
         </section>
       )}
@@ -217,15 +201,15 @@ export default function OrgProfile() {
           Contact Info
         </h2>
         <div className="flex flex-col gap-4">
-          <InfoRow icon={Mail} label={profile.email} />
-          {profile.contact_number && (
-            <InfoRow icon={Phone} label={profile.contact_number} />
+          <InfoRow icon={Mail} label={organizerProfile.email} />
+          {organizerProfile.contact_number && (
+            <InfoRow icon={Phone} label={organizerProfile.contact_number} />
           )}
-          {profile.address && <InfoRow icon={MapPin} label={profile.address} />}
-          {profile.registration_number && (
+          {organizerProfile.address && <InfoRow icon={MapPin} label={organizerProfile.address} />}
+          {organizerProfile.registration_number && (
             <InfoRow
               icon={Hash}
-              label={`Reg. No. ${profile.registration_number}`}
+              label={`Reg. No. ${organizerProfile.registration_number}`}
             />
           )}
         </div>

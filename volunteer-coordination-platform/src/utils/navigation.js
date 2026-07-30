@@ -4,7 +4,7 @@ export function getDashboardRoute(role) {
       return "/organizer/dashboard";
 
     case "volunteer":
-      return "/volunteer/dashboard";
+      return "/volunteer/explore";
 
     default:
       return "/";

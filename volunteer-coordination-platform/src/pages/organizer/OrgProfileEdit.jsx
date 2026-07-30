@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import FormField from "../../components/common/FormField";
 import TextAreaField from "../../components/common/TextAreaField";
 import AvatarUploadField from "../../components/common/AvatarUploadField";
-import { getOrganizerProfile, updateOrganizerProfile } from "../../services/profile";
 import { useToast } from "../../contexts/ToastContext";
+import { updateOrganizerProfile } from "../../services/profile";
 
 const emptyForm = {
   avatar: undefined, // undefined = unchanged, File = new upload, null = removed
@@ -20,39 +21,36 @@ export default function OrgProfileEdit() {
   const { showToast } = useToast();
 
   const [form, setForm] = useState(emptyForm);
-  const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const { organizerProfile, isVerified, loadingProfile, refetchProfile } =
+    useOutletContext();
+
+  // Sync profile data into form state when organizerProfile is ready
   useEffect(() => {
-    let isMounted = true;
-
-    getOrganizerProfile().then(({ data, error: fetchError }) => {
-      if (!isMounted) return;
-
-      if (fetchError || !data) {
-        setError("Couldn't load your profile.");
-        setLoading(false);
-        return;
-      }
-
+    if (organizerProfile) {
       setForm({
         avatar: undefined,
-        existingAvatarUrl: data.avatar_url,
-        orgName: data.org_name,
-        bio: data.bio || "",
-        address: data.address || "",
-        contactNumber: data.contact_number || "",
+        existingAvatarUrl: organizerProfile.avatar_url ?? null,
+        orgName: organizerProfile.org_name ?? "",
+        bio: organizerProfile.bio ?? "",
+        address: organizerProfile.address ?? "",
+        contactNumber: organizerProfile.contact_number ?? "",
       });
-      setLoading(false);
-    });
+    }
+  }, [organizerProfile]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  if (loadingProfile) {
+    return (
+      <p className="font-inter text-sm text-purple-600/60">
+        Loading profile...
+      </p>
+    );
+  }
 
-  const updateField = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
+  const updateField = (field, value) =>
+    setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,18 +73,17 @@ export default function OrgProfileEdit() {
       return;
     }
 
+    await refetchProfile();
     showToast({ type: "success", message: "Profile updated." });
     navigate("/organizer/profile");
   };
 
-  if (loading) {
-    return <p className="font-inter text-sm text-purple-600/60">Loading...</p>;
-  }
-
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="font-sora text-3xl font-extrabold text-purple-600">Edit Profile</h1>
+        <h1 className="font-sora text-3xl font-extrabold text-purple-600">
+          Edit Profile
+        </h1>
         <div className="flex items-center gap-3">
           <button
             type="button"

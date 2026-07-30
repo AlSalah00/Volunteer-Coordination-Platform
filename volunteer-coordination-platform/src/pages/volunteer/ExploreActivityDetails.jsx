@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Calendar, MapPin, Globe, ClipboardList } from "lucide-react";
-import TopNavBar from "../../components/common/TopNavBar";
 import StatusBadge from "../../components/activities/StatusBadge";
 import TaskPreviewCard from "../../components/activities/TaskPreviewCard";
 import LocationMapPreview from "../../components/activities/LocationMapPreview";
@@ -49,8 +48,7 @@ export default function ExploreActivityDetails() {
   if (loading) {
     return (
       <div className="min-h-screen w-full bg-purple-50">
-        <TopNavBar />
-        <p className="p-10 pt-24 font-inter text-sm text-purple-600/60">Loading...</p>
+        <p className="p-10 font-inter text-sm text-purple-600/60">Loading...</p>
       </div>
     );
   }
@@ -58,8 +56,7 @@ export default function ExploreActivityDetails() {
   if (error || !activity) {
     return (
       <div className="min-h-screen w-full bg-purple-50">
-        <TopNavBar />
-        <div className="mx-auto pt-24 max-w-3xl p-10">
+        <div className="mx-auto max-w-3xl p-10">
           <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
             {error || "Activity not found."}
           </div>
@@ -75,9 +72,8 @@ export default function ExploreActivityDetails() {
 
   return (
     <div className="min-h-screen w-full bg-purple-50">
-      <TopNavBar />
 
-      <div className="mx-auto pt-24 max-w-3xl px-6 py-10">
+      <div className="mx-auto max-w-3xl px-6 py-10">
         <button
           type="button"
           onClick={() => navigate(-1)}

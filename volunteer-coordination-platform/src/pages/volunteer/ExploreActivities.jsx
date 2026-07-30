@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal } from "lucide-react";
-import TopNavBar from "../../components/common/TopNavBar";
 import ActivityCard from "../../components/activities/ActivityCard";
 import FilterModal from "../../components/common/FilterModal";
 import { getPublicActivities } from "../../services/activities";
@@ -37,6 +36,7 @@ export default function ExploreActivities() {
   }, []);
 
   const handleApply = () => {
+    console.log("Current user:", user);
     if (!user) {
       navigate("/login");
       return;
@@ -46,9 +46,8 @@ export default function ExploreActivities() {
 
   return (
     <div className="min-h-screen w-full bg-purple-50">
-      <TopNavBar />
 
-      <div className="mx-auto pt-24 max-w-6xl px-6 py-10">
+      <div className="mx-auto max-w-6xl px-6 py-10">
         <h1 className="mb-2 font-sora text-3xl font-extrabold text-purple-600">
           Explore Activities
         </h1>
@@ -92,7 +91,7 @@ export default function ExploreActivities() {
 
         {!loading && !error && activities.length === 0 && (
           <p className="font-inter text-sm text-purple-600/60">
-            No activities open right now — check back soon.
+            No activities open right now. Check back soon.
           </p>
         )}
 

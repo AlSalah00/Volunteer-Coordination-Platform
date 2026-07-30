@@ -19,6 +19,9 @@ import OrgProfile from "../pages/organizer/OrgProfile";
 import OrgProfileEdit from "../pages/organizer/OrgProfileEdit";
 import ExploreActivities from "../pages/volunteer/ExploreActivities";
 import ExploreActivityDetails from "../pages/volunteer/ExploreActivityDetails";
+import PublicLayout from "../components/activities/PublicExploreLayout";
+import VolunteerLayout from "../components/volunteer/VolunteerLayout";
+import VolunteerProfile from "../pages/volunteer/VolunteerProfile";
 
 export default function AppRoutes() {
   return (
@@ -26,19 +29,27 @@ export default function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
-      <Route path="/explore" element={<ExploreActivities />} />
-      <Route path="/explore/:id" element={<ExploreActivityDetails />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
 
+      <Route element={<PublicLayout />}>
+        <Route path="/explore" element={<ExploreActivities />} />
+        <Route path="/explore/:id" element={<ExploreActivityDetails />} />
+      </Route>
+
       <Route
-        path="/volunteer/dashboard"
+        path="/volunteer"
         element={
           <ProtectedRoute allowedRoles={["volunteer"]}>
-            <VolunteerHomepage />
+            <VolunteerLayout />
           </ProtectedRoute>
         }
-      />
+      >
+
+        <Route index element={<ExploreActivities />} />
+        <Route path="explore" element={<ExploreActivities />} />
+        <Route path="profile" element={<VolunteerProfile />} />
+      </Route>
 
       <Route
         path="/organizer"
