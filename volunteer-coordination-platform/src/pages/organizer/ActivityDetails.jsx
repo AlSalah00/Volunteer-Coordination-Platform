@@ -48,7 +48,7 @@ export default function ActivityDetails() {
 
   const totalCapacity = (activity.activity_tasks ?? []).reduce(
     (sum, t) => sum + (t.capacity ?? 0),
-    0
+    0,
   );
 
   return (
@@ -81,7 +81,9 @@ export default function ActivityDetails() {
 
         <div className="p-6 sm:p-8">
           <div className="mb-3 flex items-start justify-between gap-3">
-            <h1 className="font-sora text-2xl font-extrabold text-purple-600">{activity.name}</h1>
+            <h1 className="font-sora text-2xl font-extrabold text-purple-600">
+              {activity.name}
+            </h1>
             <StatusBadge status={activity.status} />
           </div>
 
@@ -105,6 +107,17 @@ export default function ActivityDetails() {
             <Calendar className="h-4 w-4" />
             {formatDateRange(activity.starts_at, activity.ends_at)}
           </div>
+
+          {activity.overview && (
+            <div className="mb-6">
+              <h3 className="mb-1.5 font-sora text-sm font-bold text-purple-600">
+                Overview
+              </h3>
+              <p className="font-inter text-sm text-purple-600/70 leading-relaxed">
+                {activity.overview}
+              </p>
+            </div>
+          )}
 
           {activity.requirements && (
             <div className="mb-6">
@@ -133,7 +146,9 @@ export default function ActivityDetails() {
                 <MapPin className="h-4 w-4" />
                 Location
               </h3>
-              <p className="mb-3 font-inter text-sm text-purple-600/70">{activity.location_name}</p>
+              <p className="mb-3 font-inter text-sm text-purple-600/70">
+                {activity.location_name}
+              </p>
               <LocationMapPreview
                 lat={activity.latitude}
                 lng={activity.longitude}

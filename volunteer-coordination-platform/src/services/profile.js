@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabaseClient";
+import { getLevelInfo } from "../utils/leveling";
 
 async function uploadAvatar(file, userId) {
   const fileExt = file.name.split(".").pop();
@@ -51,6 +52,64 @@ export async function updateOrganizerProfile({
  
   if (orgError) return { data: null, error: orgError };
  
+  return { data: true, error: null };
+}
+
+export async function updateVolunteerProfile({
+  firstName,
+  lastName,
+  bio,
+  contactNumber,
+  location,
+  skills,
+  interests,
+  availability,
+  avatar,
+  existingAvatarUrl,
+}) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: null, error: userError ?? new Error("Not signed in.") };
+  }
+
+  let avatarUrl = existingAvatarUrl ?? null;
+  if (avatar === null) {
+    avatarUrl = null;
+  } else if (avatar instanceof File) {
+    const { url, error: uploadError } = await uploadAvatar(avatar, user.id);
+    if (uploadError) return { data: null, error: uploadError };
+    avatarUrl = url;
+  }
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({
+      avatar_url: avatarUrl,
+      bio: bio || null,
+      contact_number: contactNumber || null,
+    })
+    .eq("id", user.id);
+
+  if (profileError) return { data: null, error: profileError };
+
+  const { error: volError } = await supabase
+    .from("volunteer_profiles")
+    .update({
+      first_name: firstName || null,
+      last_name: lastName || null,
+      location: location || null,
+      skills: skills ?? [],
+      interests: interests ?? [],
+      availability: availability ?? {},
+    })
+    .eq("profile_id", user.id);
+
+  if (volError) return { data: null, error: volError };
+
   return { data: true, error: null };
 }
 
@@ -122,6 +181,8 @@ export async function getVolunteerProfile() {
     };
   }
 
+  const levelInfo = getLevelInfo(data.xp ?? 0);
+
   return {
     data: {
       ...data,
@@ -132,6 +193,8 @@ export async function getVolunteerProfile() {
       avatar_url: data.profiles?.avatar_url ?? null,
       bio: data.profiles?.bio ?? null,
       contact_number: data.profiles?.contact_number ?? null,
+      xp: data.xp ?? 0,
+      ...levelInfo,
     },
     error: null,
   };

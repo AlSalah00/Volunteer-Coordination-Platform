@@ -10,6 +10,7 @@ import {
   Wrench,
   Heart,
   Calendar,
+  MapPin,
 } from "lucide-react";
 import Avatar from "../../components/common/Avatar";
 import ConfirmModal from "../../components/common/ConfirmModal";
@@ -32,13 +33,41 @@ function InfoRow({ icon: Icon, label }) {
   );
 }
 
-function PillTag({ label, colorClass = "bg-purple-50 text-purple-600 border-purple-200/60" }) {
+function PillTag({
+  label,
+  colorClass = "bg-purple-50 text-purple-600 border-purple-200/60",
+}) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 font-sora text-xs font-semibold ${colorClass}`}>
+    <span
+      className={`inline-flex items-center rounded-full border px-3 py-1 font-sora text-xs font-semibold ${colorClass}`}
+    >
       {label}
     </span>
   );
 }
+
+function formatTime12h(timeStr) {
+  if (!timeStr) return "";
+  const [hoursStr, minutesStr] = timeStr.split(":");
+  let hours = parseInt(hoursStr, 10);
+  const minutes = minutesStr || "00";
+  if (isNaN(hours)) return timeStr;
+
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12;
+
+  return `${hours}:${minutes} ${ampm}`;
+}
+
+const DAYS_OF_WEEK = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 export default function VolunteerProfile() {
   const navigate = useNavigate();
@@ -70,7 +99,9 @@ export default function VolunteerProfile() {
     }
 
     setIsSendingReset(true);
-    const { error: resetError } = await sendPasswordResetEmail(volunteerProfile.email);
+    const { error: resetError } = await sendPasswordResetEmail(
+      volunteerProfile.email,
+    );
     setIsSendingReset(false);
 
     showToast(
@@ -79,7 +110,7 @@ export default function VolunteerProfile() {
             type: "error",
             message: "Couldn't send the reset email. Try again.",
           }
-        : { type: "success", message: "Password reset email sent." }
+        : { type: "success", message: "Password reset email sent." },
     );
   };
 
@@ -109,41 +140,55 @@ export default function VolunteerProfile() {
     );
   }
 
-  const fullName = [volunteerProfile.first_name, volunteerProfile.last_name]
-    .filter(Boolean)
-    .join(" ") || "Volunteer";
+  const fullName =
+    [volunteerProfile.first_name, volunteerProfile.last_name]
+      .filter(Boolean)
+      .join(" ") || "Volunteer";
 
   // Helper to format availability regardless of whether it's stored as an Array or Object
   const renderAvailability = () => {
     const avail = volunteerProfile.availability;
     if (!avail) return null;
 
-    if (Array.isArray(avail) && avail.length > 0) {
-      return (
-        <div className="flex flex-wrap gap-2">
-          {avail.map((item, idx) => (
-            <PillTag key={idx} label={item} colorClass="bg-teal-50 text-teal-700 border-teal-200/60" />
-          ))}
-        </div>
-      );
-    }
+    // Standard jsonb object format
+    if (
+      typeof avail === "object" &&
+      !Array.isArray(avail) &&
+      Object.keys(avail).length > 0
+    ) {
+      // Map strictly through DAYS_OF_WEEK to enforce chronological ordering
+      const activeSlots = DAYS_OF_WEEK.filter((day) => {
+        const slot = avail[day];
+        return slot && (typeof slot === "object" ? slot.active : Boolean(slot));
+      }).map((day) => {
+        const slot = avail[day];
+        return {
+          day,
+          start: slot.start ? formatTime12h(slot.start) : null,
+          end: slot.end ? formatTime12h(slot.end) : null,
+        };
+      });
 
-    if (typeof avail === "object" && Object.keys(avail).length > 0) {
-      const activeDays = Object.entries(avail)
-        .filter(([, active]) => Boolean(active))
-        .map(([day]) => day);
-
-      if (activeDays.length > 0) {
+      if (activeSlots.length > 0) {
         return (
-          <div className="flex flex-wrap gap-2">
-            {activeDays.map((day, idx) => (
-              <PillTag key={idx} label={day} colorClass="bg-teal-50 text-teal-700 border-teal-200/60" />
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            {activeSlots.map(({ day, start, end }, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between rounded-xl border border-purple-200/60 bg-white px-4 py-3"
+              >
+                <span className="font-sora text-sm font-bold text-purple-600">
+                  {day}
+                </span>
+                <span className="font-inter text-xs font-semibold text-purple-600">
+                  {start && end ? `${start} – ${end}` : "Available"}
+                </span>
+              </div>
             ))}
           </div>
         );
       }
     }
-
     return (
       <p className="font-inter text-sm text-purple-600/50">
         No availability set yet.
@@ -182,7 +227,7 @@ export default function VolunteerProfile() {
             <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 border border-amber-200/60">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
               <span className="font-sora text-xs font-bold text-amber-700">
-                Lvl 1 • Community Helper
+                Level {volunteerProfile.level} – {volunteerProfile.title}
               </span>
             </div>
           </div>
@@ -263,11 +308,7 @@ export default function VolunteerProfile() {
         {volunteerProfile.interests?.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {volunteerProfile.interests.map((interest, index) => (
-              <PillTag
-                key={index}
-                label={interest}
-                colorClass="bg-coral-50 text-coral-600 border-coral-200/60"
-              />
+              <PillTag key={index} label={interest} />
             ))}
           </div>
         ) : (
@@ -298,7 +339,9 @@ export default function VolunteerProfile() {
           {volunteerProfile.contact_number && (
             <InfoRow icon={Phone} label={volunteerProfile.contact_number} />
           )}
-          {volunteerProfile.location && <InfoRow icon={MapPin} label={volunteerProfile.location} />}
+          {volunteerProfile.location && (
+            <InfoRow icon={MapPin} label={volunteerProfile.location} />
+          )}
         </div>
       </section>
 

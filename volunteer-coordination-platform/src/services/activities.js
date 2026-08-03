@@ -107,6 +107,8 @@ export async function createActivity({ details, tasks }) {
     .insert({
       organizer_id: user.id,
       name: details.name,
+      overview: details.overview || null,
+      online_platform: details.activityType === "online" ? details.onlinePlatform || null : null,
       image_url: imageUrl,
       starts_at: details.startsAt ? new Date(details.startsAt).toISOString() : null,
       ends_at: details.endsAt ? new Date(details.endsAt).toISOString() : null,
@@ -129,6 +131,7 @@ export async function createActivity({ details, tasks }) {
       description: task.description || null,
       capacity: Number(task.capacity),
       level: task.level,
+      reward: task.reward,
     }));
 
     const { error: tasksError } = await supabase.from("activity_tasks").insert(taskRows);
@@ -165,6 +168,8 @@ export async function updateActivity(id, { details, tasks }) {
     .from("activities")
     .update({
       name: details.name,
+      overview: details.overview || null,
+      online_platform: details.activityType === "online" ? details.onlinePlatform || null : null,
       image_url: imageUrl,
       starts_at: details.startsAt ? new Date(details.startsAt).toISOString() : null,
       ends_at: details.endsAt ? new Date(details.endsAt).toISOString() : null,
@@ -193,6 +198,7 @@ export async function updateActivity(id, { details, tasks }) {
       description: task.description || null,
       capacity: Number(task.capacity),
       level: task.level,
+      reward: task.reward,
     }));
  
     const { error: tasksError } = await supabase.from("activity_tasks").insert(taskRows);

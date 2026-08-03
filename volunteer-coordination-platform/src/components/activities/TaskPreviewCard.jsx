@@ -1,9 +1,16 @@
-// Mirrors the options in TaskCard's LEVEL_OPTIONS — update both together.
+// Mirrors the options in TaskCard's LEVEL_OPTIONS and REWARD_OPTIONS. Update both together.
 const LEVEL_LABELS = {
   any: "Any level",
   beginner: "Beginner",
   intermediate: "Intermediate",
   advanced: "Advanced",
+};
+
+const REWARD_LABELS = {
+  50: "50 XP",
+  100: "100 XP",
+  250: "250 XP",
+  500: "500 XP",
 };
 
 export default function TaskPreviewCard({ index, task }) {
@@ -15,6 +22,7 @@ export default function TaskPreviewCard({ index, task }) {
         </span>
         <span className="shrink-0 rounded-full bg-purple-50 px-2.5 py-1 font-sora text-xs font-bold text-purple-600">
           {LEVEL_LABELS[task.level] ?? task.level}
+          {REWARD_LABELS[task.reward] ? ` • ${REWARD_LABELS[task.reward]}` : ""}
         </span>
       </div>
 

@@ -64,6 +64,7 @@ export default function ActivityForm() {
         image: undefined,
         existingImageUrl: data.image_url,
         name: data.name,
+        overview: data.overview || "",
         startsAt: toDatetimeLocal(data.starts_at),
         endsAt: toDatetimeLocal(data.ends_at),
         category: data.category,
@@ -143,7 +144,6 @@ export default function ActivityForm() {
       setError(submitError.message || "Something went wrong.");
       return;
     }
-
 
     showToast({
       type: "success",
@@ -253,6 +253,24 @@ export default function ActivityForm() {
             required
           />
 
+          <TextAreaField
+            id="activityOverview"
+            label="Activity overview"
+            placeholder="Tell volunteers about this activity..."
+            value={details.overview}
+            onChange={(e) => updateDetail("overview", e.target.value)}
+            rows={3}
+          />
+
+          <TextAreaField
+            id="requirements"
+            label="General requirements"
+            placeholder="Anything volunteers should know or bring before joining? (e.g. comfortable shoes, own transport)"
+            value={details.requirements}
+            onChange={(e) => updateDetail("requirements", e.target.value)}
+            rows={3}
+          />
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               id="startsAt"
@@ -292,7 +310,7 @@ export default function ActivityForm() {
               </div>
               <p className="font-inter text-xs text-purple-600/50">
                 {isEditMode
-                  ? "Status updates automatically as your activity progresses."
+                  ? "You can update the status in the activity tracking page."
                   : "New activities always start as upcoming."}
               </p>
             </div>
@@ -318,15 +336,6 @@ export default function ActivityForm() {
               onChange={(val) => updateDetail("location", val)}
             />
           )}
-
-          <TextAreaField
-            id="requirements"
-            label="General requirements"
-            placeholder="Anything volunteers should know or bring before joining? (e.g. comfortable shoes, own transport)"
-            value={details.requirements}
-            onChange={(e) => updateDetail("requirements", e.target.value)}
-            rows={3}
-          />
         </div>
       </section>
 

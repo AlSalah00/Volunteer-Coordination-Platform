@@ -3,12 +3,18 @@ import FormField from "../common/FormField";
 import TextAreaField from "../common/TextAreaField";
 import SelectField from "../common/SelectField";
 
-// Provisional — swap once the real leveling system is defined.
 const LEVEL_OPTIONS = [
   { value: "any", label: "Any level" },
   { value: "beginner", label: "Beginner" },
   { value: "intermediate", label: "Intermediate" },
   { value: "advanced", label: "Advanced" },
+];
+
+const REWARD_OPTIONS = [
+  { value: 50, label: "50 XP" },
+  { value: 100, label: "100 XP" },
+  { value: 250, label: "250 XP" },
+  { value: 500, label: "500 XP" },
 ];
 
 export default function TaskCard({ index, task, onChange, onRemove }) {
@@ -17,7 +23,9 @@ export default function TaskCard({ index, task, onChange, onRemove }) {
   return (
     <div className="relative flex flex-col gap-4 rounded-xl border border-purple-200/60 bg-purple-50/40 p-5">
       <div className="flex items-center justify-between">
-        <span className="font-sora text-sm font-bold text-purple-600">Task {index + 1}</span>
+        <span className="font-sora text-sm font-bold text-purple-600">
+          Task {index + 1}
+        </span>
         <button
           type="button"
           onClick={onRemove}
@@ -63,8 +71,15 @@ export default function TaskCard({ index, task, onChange, onRemove }) {
           id={`task-level-${task.id}`}
           label="Level required"
           value={task.level}
-          onChange={(e) => update("level", e.target.value)}
+          onChange={(val) => update("level", val)}
           options={LEVEL_OPTIONS}
+        />
+        <SelectField
+          id={`task-reward-${task.id}`}
+          label="XP reward"
+          value={task.reward}
+          onChange={(val) => update("reward", val)}
+          options={REWARD_OPTIONS}
         />
       </div>
     </div>

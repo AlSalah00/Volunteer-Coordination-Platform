@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Search, SlidersHorizontal } from "lucide-react";
 import ActivityCard from "../../components/activities/ActivityCard";
 import FilterModal from "../../components/common/FilterModal";
@@ -9,6 +9,7 @@ import { useAuth } from "../../contexts/AuthContext";
 
 export default function ExploreActivities() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   const [activities, setActivities] = useState([]);
@@ -16,6 +17,9 @@ export default function ExploreActivities() {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState(""); // not wired up yet
   const [showFilters, setShowFilters] = useState(false);
+
+  const isVolunteerRoute = location.pathname.startsWith("/volunteer");
+  const basePath = isVolunteerRoute ? "/volunteer/explore" : "/explore";
 
   useEffect(() => {
     let isMounted = true;
@@ -35,6 +39,10 @@ export default function ExploreActivities() {
     };
   }, []);
 
+  const handleCardClick = (id) => {
+    navigate(`${basePath}/${id}`);
+  };
+
   const handleApply = () => {
     console.log("Current user:", user);
     if (!user) {
@@ -46,7 +54,6 @@ export default function ExploreActivities() {
 
   return (
     <div className="min-h-screen w-full bg-purple-50">
-
       <div className="mx-auto max-w-6xl px-6 py-10">
         <h1 className="mb-2 font-sora text-3xl font-extrabold text-purple-600">
           Explore Activities
@@ -80,7 +87,9 @@ export default function ExploreActivities() {
         </div>
 
         {loading && (
-          <p className="font-inter text-sm text-purple-600/60">Loading activities...</p>
+          <p className="font-inter text-sm text-purple-600/60">
+            Loading activities...
+          </p>
         )}
 
         {error && (
@@ -101,7 +110,7 @@ export default function ExploreActivities() {
               key={activity.id}
               {...activity}
               variant="volunteer"
-              onClick={() => navigate(`/explore/${activity.id}`)}
+              onClick={() => handleCardClick(activity.id)}
               onApply={handleApply}
             />
           ))}

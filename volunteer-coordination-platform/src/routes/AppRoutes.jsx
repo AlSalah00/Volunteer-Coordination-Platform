@@ -22,6 +22,7 @@ import ExploreActivityDetails from "../pages/volunteer/ExploreActivityDetails";
 import PublicLayout from "../components/activities/PublicExploreLayout";
 import VolunteerLayout from "../components/volunteer/VolunteerLayout";
 import VolunteerProfile from "../pages/volunteer/VolunteerProfile";
+import VolunteerProfileEdit from "../pages/volunteer/VolunteerProfileEdit";
 
 export default function AppRoutes() {
   return (
@@ -48,7 +49,9 @@ export default function AppRoutes() {
 
         <Route index element={<ExploreActivities />} />
         <Route path="explore" element={<ExploreActivities />} />
+        <Route path="explore/:id" element={<ExploreActivityDetails />} />
         <Route path="profile" element={<VolunteerProfile />} />
+        <Route path="profile/edit" element={<VolunteerProfileEdit />} />
       </Route>
 
       <Route
