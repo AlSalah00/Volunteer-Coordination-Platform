@@ -19,6 +19,19 @@ export const TITLE_BRACKETS = [
   { minLevel: 46, maxLevel: 50, title: "Beacon" },
 ];
 
+export const TITLE_ORDER = [
+  "Newcomer",
+  "Helper",
+  "Kind Soul",
+  "Dedicated Supporter",
+  "Active Hand",
+  "Changemaker",
+  "Inspirer",
+  "Community Builder",
+  "Community Hero",
+  "Beacon",
+];
+
 // Generate level brackets automatically
 
 export const LEVEL_BRACKETS = (() => {
@@ -50,6 +63,17 @@ export function getTitle(level) {
   );
 
   return bracket?.title ?? TITLE_BRACKETS[0].title;
+}
+
+export function hasRequiredTitle(volunteerTitle, requiredTitle) {
+  if (!requiredTitle || requiredTitle === "any") return true;
+
+  const volunteerRank = TITLE_ORDER.indexOf(volunteerTitle);
+  const requiredRank = TITLE_ORDER.indexOf(requiredTitle);
+
+  if (requiredRank === -1) return true;
+
+  return volunteerRank >= requiredRank;
 }
 
 export function getLevelInfo(xp = 0) {

@@ -200,6 +200,22 @@ export async function getVolunteerProfile() {
   };
 }
 
+export function isVolunteerProfileComplete(profile) {
+  if (!profile) return false;
+ 
+  const hasSkills = (profile.skills?.length ?? 0) > 0;
+  const hasInterests = (profile.interests?.length ?? 0) > 0;
+  const hasAvailability = Boolean(
+    profile.availability &&
+      (Array.isArray(profile.availability)
+        ? profile.availability.length > 0
+        : Object.keys(profile.availability).length > 0)
+  );
+  const hasLocation = Boolean(profile.location);
+ 
+  return hasSkills && hasInterests && hasAvailability && hasLocation;
+}
+
 export async function getCurrentProfile() {
   const {
     data: { user },

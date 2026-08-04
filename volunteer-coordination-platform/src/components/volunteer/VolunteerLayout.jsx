@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../common/Sidebar";
 import { signOut } from "../../services/auth";
+import { useNavigate } from "react-router-dom";
 import { getVolunteerProfile } from "../../services/profile";
 import { Compass, Calendar, Bookmark, Award } from "lucide-react";
 

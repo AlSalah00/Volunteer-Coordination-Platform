@@ -207,6 +207,31 @@ export async function updateActivity(id, { details, tasks }) {
  
   return { data: activity, error: null };
 }
+
+export async function checkUserApplicationStatus(activityId) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      data: false,
+      error: null,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("applications")
+    .select("id")
+    .eq("activity_id", activityId)
+    .eq("volunteer_id", user.id)
+    .maybeSingle();
+
+  return {
+    data: Boolean(data),
+    error,
+  };
+}
  
 // Note this doesn't delete the uploaded photo from Supabase storage.
 export async function deleteActivity(id) {

@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  Link,
+  useOutletContext,
+} from "react-router-dom";
 import { Calendar, MapPin, Globe, ClipboardList } from "lucide-react";
 import StatusBadge from "../../components/activities/StatusBadge";
 import TaskPreviewCard from "../../components/activities/TaskPreviewCard";
@@ -8,41 +13,102 @@ import Avatar from "../../components/common/Avatar";
 import { getPublicActivityById } from "../../services/activities";
 import { formatDateRange } from "../../utils/activities";
 import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import defaultActivityImage from "../../assets/defaultActivityImage.svg";
+import ConfirmModal from "../../components/common/ConfirmModal";
+import TaskSelectionModal from "../../components/activities/TaskSelectionModal";
+import { isVolunteerProfileComplete } from "../../services/profile";
+import { submitApplication } from "../../services/applications";
+import { checkUserApplicationStatus } from "../../services/activities";
 
 export default function ExploreActivityDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const outletContext = useOutletContext();
+  const volunteerProfile = outletContext?.volunteerProfile ?? null;
 
   const [activity, setActivity] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [hasApplied, setHasApplied] = useState(false);
+
+  const [showIncompleteProfileModal, setShowIncompleteProfileModal] =
+    useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [isSubmittingApplication, setIsSubmittingApplication] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    getPublicActivityById(id).then(({ data, error: fetchError }) => {
+    async function loadPage() {
+      setLoading(true);
+
+      const [{ data, error }, { data: hasApplied }] = await Promise.all([
+        getPublicActivityById(id),
+        volunteerProfile
+          ? checkUserApplicationStatus(id)
+          : Promise.resolve({ data: false, error: null }),
+      ]);
+
       if (!isMounted) return;
-      if (fetchError || !data) {
+
+      if (error || !data) {
         setError("Couldn't load this activity.");
       } else {
         setActivity(data);
+        setHasApplied(hasApplied);
       }
+
       setLoading(false);
-    });
+    }
+
+    loadPage();
 
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, volunteerProfile]);
 
-  const handleApply = () => {
+  const handleApplyClick = () => {
     if (!user) {
       navigate("/login");
       return;
     }
-    // TODO: real apply flow (task slot selection) comes later
+
+    if (!isVolunteerProfileComplete(volunteerProfile)) {
+      setShowIncompleteProfileModal(true);
+      return;
+    }
+
+    setShowTaskModal(true);
+  };
+
+  const handleConfirmApplication = async (taskId) => {
+    if (!activity?.id) return;
+
+    setIsSubmittingApplication(true);
+    const { error: submitError } = await submitApplication({
+      activityId: activity.id,
+      taskId,
+    });
+    setIsSubmittingApplication(false);
+
+    if (submitError) {
+      showToast({
+        type: "error",
+        message: "Couldn't submit your application. Try again.",
+      });
+      return;
+    }
+
+    setShowTaskModal(false);
+    setHasApplied(true);
+    showToast({
+      type: "success",
+      message: "You're in! We'll let you know once it's reviewed.",
+    });
   };
 
   if (loading) {
@@ -67,12 +133,11 @@ export default function ExploreActivityDetails() {
 
   const totalCapacity = (activity.activity_tasks ?? []).reduce(
     (sum, t) => sum + (t.capacity ?? 0),
-    0
+    0,
   );
 
   return (
     <div className="min-h-screen w-full bg-purple-50">
-
       <div className="mx-auto max-w-3xl px-6 py-10">
         <button
           type="button"
@@ -92,7 +157,9 @@ export default function ExploreActivityDetails() {
 
           <div className="p-6 sm:p-8">
             <div className="mb-3 flex items-start justify-between gap-3">
-              <h1 className="font-sora text-2xl font-extrabold text-purple-600">{activity.name}</h1>
+              <h1 className="font-sora text-2xl font-extrabold text-purple-600">
+                {activity.name}
+              </h1>
               <StatusBadge status={activity.status} />
             </div>
 
@@ -100,7 +167,11 @@ export default function ExploreActivityDetails() {
               to={`/organizers/${activity.organizer_id}`}
               className="mb-5 flex w-fit items-center gap-2.5 rounded-full py-1 pr-3 transition-colors hover:bg-purple-50"
             >
-              <Avatar src={activity.organizer_avatar_url} name={activity.organizer_name} size={32} />
+              <Avatar
+                src={activity.organizer_avatar_url}
+                name={activity.organizer_name}
+                size={32}
+              />
               <span className="font-inter text-sm font-medium text-purple-600">
                 {activity.organizer_name}
               </span>
@@ -154,7 +225,9 @@ export default function ExploreActivityDetails() {
                   <MapPin className="h-4 w-4" />
                   Location
                 </h3>
-                <p className="mb-3 font-inter text-sm text-purple-600/70">{activity.location_name}</p>
+                <p className="mb-3 font-inter text-sm text-purple-600/70">
+                  {activity.location_name}
+                </p>
                 <LocationMapPreview
                   lat={activity.latitude}
                   lng={activity.longitude}
@@ -173,7 +246,8 @@ export default function ExploreActivityDetails() {
               Tasks
             </h2>
             <span className="font-inter text-sm text-purple-600/60">
-              {totalCapacity} volunteer spot{totalCapacity === 1 ? "" : "s"} total
+              {totalCapacity} volunteer spot{totalCapacity === 1 ? "" : "s"}{" "}
+              total
             </span>
           </div>
 
@@ -186,13 +260,33 @@ export default function ExploreActivityDetails() {
 
         <button
           type="button"
-          onClick={handleApply}
+          onClick={handleApplyClick}
+          disabled={hasApplied}
           className="w-full rounded-md bg-purple-600 py-3.5 font-sora text-base font-bold text-purple-50
-                     transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer"
+                     transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer
+                     disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
         >
-          Count Me In
+          {hasApplied ? "Application Submitted" : "Count Me In"}
         </button>
       </div>
+
+      <ConfirmModal
+        isOpen={showIncompleteProfileModal}
+        title="Let's finish your profile first"
+        description="To get matched with the right activities, we just need a bit more info about you — a few skills, interests, your availability, and your location."
+        confirmLabel="Complete Profile"
+        cancelLabel="Maybe Later"
+        onConfirm={() => navigate("/volunteer/profile/edit")}
+        onCancel={() => setShowIncompleteProfileModal(false)}
+      />
+
+      <TaskSelectionModal
+        isOpen={showTaskModal}
+        onClose={() => setShowTaskModal(false)}
+        tasks={activity.activity_tasks ?? []}
+        isSubmitting={isSubmittingApplication}
+        onConfirm={handleConfirmApplication}
+      />
     </div>
   );
 }

@@ -43,13 +43,13 @@ export default function ExploreActivities() {
     navigate(`${basePath}/${id}`);
   };
 
-  const handleApply = () => {
+  const handleApply = (id) => {
     console.log("Current user:", user);
     if (!user) {
       navigate("/login");
       return;
     }
-    // TODO: real apply flow (task slot selection) comes later
+    navigate(`${basePath}/${id}`);
   };
 
   return (
@@ -111,7 +111,7 @@ export default function ExploreActivities() {
               {...activity}
               variant="volunteer"
               onClick={() => handleCardClick(activity.id)}
-              onApply={handleApply}
+              onApply={() => handleApply(activity.id)}
             />
           ))}
         </div>
