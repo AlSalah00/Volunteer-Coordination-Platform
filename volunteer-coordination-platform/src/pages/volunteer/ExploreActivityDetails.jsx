@@ -109,6 +109,7 @@ export default function ExploreActivityDetails() {
       type: "success",
       message: "You're in! We'll let you know once it's reviewed.",
     });
+    navigate("/volunteer/my-activities");
   };
 
   if (loading) {

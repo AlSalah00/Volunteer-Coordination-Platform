@@ -1,3 +1,5 @@
+import { STATUS_META } from "../components/activities/StatusBadge";
+
 // Helper to safely parse strings across all browsers (including Safari)
 function parseDate(input) {
   if (!input) return null;
@@ -92,15 +94,15 @@ export function shortenLocation(address, maxLength = 30) {
 export function mapActivityToCard(activity) {
   const volunteersCapacity = (activity.activity_tasks ?? []).reduce(
     (sum, task) => sum + (task.capacity ?? 0),
-    0,
+    0
   );
-
+ 
   return {
     id: activity.id,
     title: activity.name,
     image: activity.image_url,
     date: activity.starts_at,
-    status: activity.status,
+    status: STATUS_META[activity.status]?.label ?? activity.status,
     category: activity.category,
     type: activity.activity_type === "online" ? "online" : "in-person",
     shortLocation: shortenLocation(activity.location_name),
