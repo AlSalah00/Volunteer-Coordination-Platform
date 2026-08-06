@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import Sidebar from "../common/Sidebar";
 import VerificationBanner from "./VerificationBanner";
 import { signOut } from "../../services/auth";

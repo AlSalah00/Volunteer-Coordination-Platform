@@ -11,6 +11,7 @@ import { signIn } from "../services/auth";
 import { getCurrentProfile } from "../services/profile";
 import { getDashboardRoute } from "../utils/navigation";
 import { getFriendlyAuthError } from "../utils/authErrors";
+import Button from "../components/common/Button";
 
 const copy = {
   volunteer: {
@@ -112,15 +113,13 @@ export default function Login() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="mt-1 w-full rounded-md bg-purple-600 py-3 font-sora text-sm font-bold text-purple-50
-                       transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer
-                       disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+            className="mt-1 w-full py-3"
           >
             {isSubmitting ? "Logging in..." : "Log In"}
-          </button>
+          </Button>
 
           {role === "volunteer" && <OAuthButtons actionLabel="Log in" />}
         </motion.form>

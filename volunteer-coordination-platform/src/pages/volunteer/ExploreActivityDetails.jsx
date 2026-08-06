@@ -20,6 +20,7 @@ import TaskSelectionModal from "../../components/activities/TaskSelectionModal";
 import { isVolunteerProfileComplete } from "../../services/profile";
 import { submitApplication } from "../../services/applications";
 import { checkUserApplicationStatus } from "../../services/activities";
+import Button from "../../components/common/Button";
 
 export default function ExploreActivityDetails() {
   const { id } = useParams();
@@ -98,7 +99,7 @@ export default function ExploreActivityDetails() {
     if (submitError) {
       showToast({
         type: "error",
-        message: "Couldn't submit your application. Try again.",
+        message: "Oh no! We couldn't send your request. Please try again.",
       });
       return;
     }
@@ -107,7 +108,7 @@ export default function ExploreActivityDetails() {
     setHasApplied(true);
     showToast({
       type: "success",
-      message: "You're in! We'll let you know once it's reviewed.",
+      message: "Thanks for raising your hand! Your request to participate has been sent to the host.",
     });
     navigate("/volunteer/my-activities");
   };
@@ -259,16 +260,13 @@ export default function ExploreActivityDetails() {
           </div>
         </section>
 
-        <button
-          type="button"
+        <Button
           onClick={handleApplyClick}
           disabled={hasApplied}
-          className="w-full rounded-md bg-purple-600 py-3.5 font-sora text-base font-bold text-purple-50
-                     transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer
-                     disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+          className="w-full"
         >
           {hasApplied ? "Application Submitted" : "Count Me In"}
-        </button>
+        </Button>
       </div>
 
       <ConfirmModal

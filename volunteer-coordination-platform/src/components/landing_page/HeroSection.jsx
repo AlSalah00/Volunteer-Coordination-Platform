@@ -4,6 +4,7 @@ import heroBg from "../../assets/heroBg.svg";
 import heart1 from "../../assets/heart1.svg";
 import heart2 from "../../assets/heart2.svg";
 import heart3 from "../../assets/heart3.svg";
+import Button from "../common/Button";
 
 const hearts = [
   {
@@ -113,23 +114,20 @@ export default function HeroSection() {
 
           <div className="flex items-center gap-4 mt-2 flex-wrap">
             <Link to="/signup">
-              <button
-                className="px-7 py-3 rounded-md text-sm font-bold bg-purple-600 text-purple-300 font-sora
-                           transition-all duration-200 hover:bg-purple-800
-                           active:scale-95 cursor-pointer"
+              <Button
+              className="px-6 py-3"
               >
                 Join Now
-              </button>
+              </Button>
             </Link>
 
             <Link to="/explore">
-              <button
-                className="px-6 py-3 rounded-md text-sm font-bold border-2 border-purple-600 text-purple-600 font-sora bg-transparent
-                           transition-all duration-200 hover:bg-purple-50
-                           active:scale-95 cursor-pointer"
+              <Button
+                variant="secondary"
+                className="px-6 py-3 bg-transparent"
               >
                 Explore activities
-              </button>
+              </Button>
             </Link>
           </div>
         </div>

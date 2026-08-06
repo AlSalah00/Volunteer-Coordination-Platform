@@ -7,6 +7,7 @@ import AuthSidePanel from "../components/auth/AuthSidePanel";
 import RoleToggle from "../components/auth/RoleToggle";
 import FormField from "../components/auth/FormField";
 import PasswordField from "../components/auth/PasswordField";
+import Button from "../components/common/Button";
 import OAuthButtons from "../components/auth/OAuthButtons";
 import { signUpVolunteer, signUpOrganizer } from "../services/auth";
 import { getDashboardRoute } from "../utils/navigation";
@@ -209,15 +210,13 @@ export default function Signup() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="mt-1 w-full rounded-md bg-purple-600 py-3 font-sora text-sm font-bold text-purple-50
-                       transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer
-                       disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+            className="mt-1 w-full py-3"
           >
             {isSubmitting ? "Creating account..." : "Create account"}
-          </button>
+          </Button>
 
           {role === "volunteer" && <OAuthButtons actionLabel="Sign up" />}
         </motion.form>

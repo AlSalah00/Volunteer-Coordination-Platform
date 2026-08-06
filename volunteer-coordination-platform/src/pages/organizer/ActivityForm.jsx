@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import FormField from "../../components/common/FormField";
 import TextAreaField from "../../components/common/TextAreaField";
+import Button from "../../components/common/Button";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import ImageUploadField from "../../components/activities/ImageUploadField";
 import LocationPicker from "../../components/activities/LocationPicker";
@@ -186,34 +187,26 @@ export default function ActivityForm() {
           {isEditMode ? "Edit Activity" : "New Activity"}
         </h1>
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          <Button
             onClick={() => navigate(-1)}
-            className="rounded-md px-5 py-2.5 font-sora text-sm font-bold text-purple-600
-                       transition-colors hover:bg-purple-50 cursor-pointer"
+            variant="cancel"
           >
             Cancel
-          </button>
+          </Button>
 
           {isEditMode && (
-            <button
-              type="button"
+            <Button
               onClick={() => setShowDeleteModal(true)}
               disabled={isDeleting}
-              className="rounded-md px-5 py-2.5 font-sora text-sm font-bold text-coral-600
-                         transition-colors hover:bg-coral-50 cursor-pointer
-                         disabled:opacity-60 disabled:cursor-not-allowed"
+              variant="danger"
             >
               {isDeleting ? "Deleting..." : "Delete Activity"}
-            </button>
+            </Button>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-md bg-purple-600 px-6 py-2.5 font-sora text-sm font-bold text-purple-50
-                       transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer
-                       disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             {isSubmitting
               ? isEditMode
@@ -222,7 +215,7 @@ export default function ActivityForm() {
               : isEditMode
                 ? "Update Activity"
                 : "Publish Activity"}
-          </button>
+          </Button>
         </div>
       </div>
 

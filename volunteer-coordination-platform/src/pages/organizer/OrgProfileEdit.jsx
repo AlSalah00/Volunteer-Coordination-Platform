@@ -6,6 +6,7 @@ import TextAreaField from "../../components/common/TextAreaField";
 import AvatarUploadField from "../../components/common/AvatarUploadField";
 import { useToast } from "../../contexts/ToastContext";
 import { updateOrganizerProfile } from "../../services/profile";
+import Button from "../../components/common/Button";
 
 const emptyForm = {
   avatar: undefined, // undefined = unchanged, File = new upload, null = removed
@@ -85,23 +86,18 @@ export default function OrgProfileEdit() {
           Edit Profile
         </h1>
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          <Button
             onClick={() => navigate(-1)}
-            className="rounded-md px-5 py-2.5 font-sora text-sm font-bold text-purple-600
-                       transition-colors hover:bg-purple-50 cursor-pointer"
+            variant="cancel"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isSaving}
-            className="rounded-md bg-purple-600 px-6 py-2.5 font-sora text-sm font-bold text-purple-50
-                       transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer
-                       disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             {isSaving ? "Saving..." : "Save Changes"}
-          </button>
+          </Button>
         </div>
       </div>
 

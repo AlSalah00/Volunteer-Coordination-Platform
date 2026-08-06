@@ -8,6 +8,7 @@ import { updatePassword } from "../services/auth";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { getDashboardRoute } from "../utils/navigation";
+import Button from "../components/common/Button";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -138,13 +139,13 @@ export default function ResetPassword() {
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className="mt-1 w-full rounded-md bg-purple-600 py-3 font-sora text-sm font-bold text-purple-50 transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+          lablel={isSubmitting ? "Updating..." : "Update Password"}
         >
           {isSubmitting ? "Updating..." : "Update Password"}
-        </button>
+        </Button>
       </form>
     </AuthLayout>
   );

@@ -9,6 +9,7 @@ import {
   Bookmark,
 } from "lucide-react";
 import StatusBadge from "./StatusBadge";
+import Button from "../common/Button";
 import { formatDateTime } from "../../utils/activities";
 import defaultActivityImage from "../../assets/defaultActivityImage.svg";
 
@@ -20,7 +21,6 @@ function ActionIcon({ icon: Icon, label, onClick }) {
 
   return (
     <button
-      type="button"
       onClick={handleClick}
       aria-label={label}
       className="group relative flex h-9 w-9 items-center justify-center rounded-full bg-purple-50 text-purple-600
@@ -180,30 +180,43 @@ export default function ActivityCard({
           </div>
         </div>
 
-        {variant === "volunteer-applications" ? (
-          <div className="mt-auto pt-1">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                {onTrack?.(e)}
-              }}
-              className="w-full rounded-md bg-purple-600 py-2.5 font-sora text-sm font-bold text-purple-50
-                         transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer"
-            >
-              Track
-            </button>
-          </div>
-        ) : (
-          <div className="mt-auto flex items-center gap-2 pt-1">
-            <ActionIcon icon={Pencil} label="Edit" onClick={onEdit} />
-            <ActionIcon icon={ClipboardCheck} label="Track" onClick={onTrack} />
-            <ActionIcon
-              icon={UserCheck}
-              label="Applicants"
-              onClick={onViewApplicants}
-            />
-          </div>
+        {/* Separator + Actions */}
+        {variant === "volunteer-applications" && (
+          <>
+            <div className="my-4 border-t border-purple-100" />
+
+            <div className="mt-auto pt-1">
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTrack?.(e);
+                }}
+                className="w-full"
+              >
+                Where Things Stand
+              </Button>
+            </div>
+          </>
+        )}
+
+        {variant === "organizer" && (
+          <>
+            <div className="my-4 border-t border-purple-100" />
+
+            <div className="mt-auto flex items-center gap-2 pt-1">
+              <ActionIcon icon={Pencil} label="Edit" onClick={onEdit} />
+              <ActionIcon
+                icon={ClipboardCheck}
+                label="Track"
+                onClick={onTrack}
+              />
+              <ActionIcon
+                icon={UserCheck}
+                label="Applicants"
+                onClick={onViewApplicants}
+              />
+            </div>
+          </>
         )}
       </div>
     </div>

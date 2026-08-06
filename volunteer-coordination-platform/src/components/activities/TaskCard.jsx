@@ -2,6 +2,7 @@ import { Trash2 } from "lucide-react";
 import FormField from "../common/FormField";
 import TextAreaField from "../common/TextAreaField";
 import SelectField from "../common/SelectField";
+import Button from "../common/Button";
 
 const LEVEL_OPTIONS = [
   { value: "any", label: "Any level" },
@@ -26,15 +27,13 @@ export default function TaskCard({ index, task, onChange, onRemove }) {
         <span className="font-sora text-sm font-bold text-purple-600">
           Task {index + 1}
         </span>
-        <button
-          type="button"
+        <Button
           onClick={onRemove}
           aria-label="Remove task"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-purple-600/50
-                     transition-colors hover:bg-coral-50 hover:text-coral-600 cursor-pointer"
+          variant="danger"
         >
           <Trash2 className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
 
       <FormField

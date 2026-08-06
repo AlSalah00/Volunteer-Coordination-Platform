@@ -48,11 +48,11 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
     setShowWithdrawConfirm(false);
 
     if (withdrawError) {
-      showToast({ type: "error", message: "Couldn't withdraw your application. Try again." });
+      showToast({ type: "error", message: "We couldn't withdraw your request to join. Please try again." });
       return;
     }
 
-    showToast({ type: "success", message: "Application withdrawn." });
+    showToast({ type: "success", message: "Request withdrawn." });
     onWithdrawn?.(applicationId);
     onClose();
   };
@@ -66,7 +66,7 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
 
   return (
     <>
-      <Drawer isOpen={isOpen} onClose={onClose} title="Application State">
+      <Drawer isOpen={isOpen} onClose={onClose} title="Activity State">
         {loading && <p className="font-inter text-sm text-purple-600/60">Loading...</p>}
 
         {error && (
@@ -98,25 +98,25 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
             </div>
 
             {/* What's next */}
-            <div className="flex gap-3 rounded-xl bg-teal-50 p-4">
-              <Info className="h-4 w-4 shrink-0 text-teal-600" />
+            <div className="flex gap-3 rounded-xl border border-purple-200/60 bg-purple-50/50 p-4">
+              <Info className="h-4 w-4 shrink-0 text-purple-600/50" />
               <div>
-                <p className="mb-1 font-sora text-xs font-bold tracking-wide text-teal-600/70">
+                <p className="mb-1 font-sora text-xs font-bold tracking-wide text-purple-600/50">
                   What's next
                 </p>
-                <p className="font-inter text-sm leading-relaxed text-teal-700">{state.whatsNext}</p>
+                <p className="font-inter text-sm leading-relaxed text-purple-600/80">{state.whatsNext}</p>
               </div>
             </div>
 
             {/* AI feedback. Only while it's still relevant */}
             {state.showAiFeedback && details.volunteerFeedback && (
-              <div className="flex gap-3 rounded-xl bg-amber-50 p-4">
-                <Sparkles className="h-4 w-4 shrink-0 text-amber-800" />
+              <div className="flex gap-3 rounded-xl border border-purple-200/60 bg-purple-50/50 p-4">
+                <Sparkles className="h-4 w-4 shrink-0 text-purple-600/50" />
                 <div>
-                  <p className="mb-1 font-sora text-xs font-bold tracking-wide text-amber-800/70">
+                  <p className="mb-1 font-sora text-xs font-bold tracking-wide text-purple-600/50">
                     A note from our AI helper
                   </p>
-                  <p className="font-inter text-sm leading-relaxed text-amber-800">
+                  <p className="font-inter text-sm leading-relaxed text-purple-600/80">
                     {details.volunteerFeedback}
                   </p>
                 </div>

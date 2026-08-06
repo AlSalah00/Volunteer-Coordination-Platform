@@ -7,34 +7,43 @@
 export function getApplicationState({ applicationStatus, activityStatus }) {
   if (applicationStatus === "rejected") {
     return {
-      label: "Not Selected",
-      state: "The organizer went with other volunteers for this one.",
-      whatsNext: "No action needed, there are plenty of other activities to explore.",
+      label: "Not this time",
+      state: "The host went with other volunteers for this one.",
+      whatsNext: "Don't be discouraged. There are plenty of other activities to explore.",
       showAiFeedback: false,
-      showWithdrawButton: false,
+      action: {
+        label: "Explore other activities",
+        type: "NAVIGATE_EXPLORE",
+        variant: "secondary",
+      }
     };
   }
 
   if (activityStatus === "cancelled") {
     return {
       label: "Activity Cancelled",
-      state:
-        applicationStatus === "approved"
-          ? "This activity was cancelled after you were approved."
-          : "This activity was cancelled before your application could be reviewed.",
-      whatsNext: "No action needed on your part.",
+      state: "Unfortunately, this activity was cancelled by the host.",
+      whatsNext: "No action needed on your part. Feel free to explore other activities.",
       showAiFeedback: false,
-      showWithdrawButton: false,
+      action: {
+        label: "Explore other activities",
+        type: "NAVIGATE_EXPLORE",
+        variant: "secondary",
+      }
     };
   }
 
   if (applicationStatus === "submitted") {
     return {
-      label: "Pending",
-      state: "You've submitted your application.",
-      whatsNext: "Sit tight, the organizer will review it soon.",
+      label: "Awaiting Host",
+      state: "You've raised your hand for this!",
+      whatsNext: "Sit tight, the host is finalizing the team and will update you soon.",
       showAiFeedback: true,
-      showWithdrawButton: true,
+      action: {
+        label: "Withdraw Application",
+        type: "WITHDRAW_APPLICATION",
+        variant: "danger",
+      }
     };
   }
 
@@ -43,9 +52,13 @@ export function getApplicationState({ applicationStatus, activityStatus }) {
     return {
       label: "Happening Now",
       state: "This activity is happening right now!",
-      whatsNext: "Head to your assigned task and give it your best.",
+      whatsNext: "Head to your assigned task and give it your best. And don't forget to check in!",
       showAiFeedback: false,
-      showWithdrawButton: false,
+      action: {
+        label: "Check In!",
+        type: "CHECK_IN",
+        variant: "primary",
+      }
     };
   }
 
@@ -55,16 +68,24 @@ export function getApplicationState({ applicationStatus, activityStatus }) {
       state: "You completed this activity. Nice work!",
       whatsNext: "Check back for new activities to join.",
       showAiFeedback: false,
-      showWithdrawButton: false,
+      action: {
+        label: "Explore other activities",
+        type: "NAVIGATE_EXPLORE",
+        variant: "secondary",
+      }
     };
   }
 
   // activityStatus === "upcoming"
   return {
-    label: "Approved",
-    state: "Congratulations! You've been approved to participate.",
-    whatsNext: "Mark your calendar, the activity hasn't started yet.",
+    label: "You're In!",
+    state: "Spot confirmed! You're officially part of the team.",
+    whatsNext: "Mark your calendar, we can't wait to see you there.",
     showAiFeedback: false,
-    showWithdrawButton: false,
+    action: {
+      label: "Back",
+      type: "NAVIGATE_BACK",
+      variant: "secondary",
+    }
   };
 }

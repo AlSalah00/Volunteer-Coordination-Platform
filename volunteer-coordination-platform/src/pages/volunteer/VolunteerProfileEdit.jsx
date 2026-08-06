@@ -6,6 +6,7 @@ import TextAreaField from "../../components/common/TextAreaField";
 import AvatarUploadField from "../../components/common/AvatarUploadField";
 import { useToast } from "../../contexts/ToastContext";
 import { updateVolunteerProfile } from "../../services/profile";
+import Button from "../../components/common/Button";
 
 const DAYS_OF_WEEK = [
   "Sunday",
@@ -28,10 +29,10 @@ const emptyForm = {
   location: "",
   skills: [],
   interests: [],
-  availability: {}, // e.g. { Sunday: { active: true, start: "10:00", end: "15:00" } }
+  availability: {},
 };
 
-// --- Helper Component for Dynamic Tag Inputs ---
+// Helper Component for Dynamic Tag Inputs
 function TagInput({ label, tags, onAddTag, onRemoveTag, placeholder, colorTheme = "purple" }) {
   const [inputValue, setInputValue] = useState("");
 
@@ -104,7 +105,7 @@ function TagInput({ label, tags, onAddTag, onRemoveTag, placeholder, colorTheme 
   );
 }
 
-// --- Helper Component for Availability Timetable ---
+// Helper Component for Availability Timetable
 function SchedulePicker({ availability, onChange }) {
   const toggleDay = (day) => {
     const updated = { ...availability };
@@ -203,7 +204,7 @@ function SchedulePicker({ availability, onChange }) {
   );
 }
 
-// --- Main Edit Component ---
+// Main Edit Component
 export default function VolunteerProfileEdit() {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -305,23 +306,18 @@ export default function VolunteerProfileEdit() {
           Edit Profile
         </h1>
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          <Button
             onClick={() => navigate(-1)}
-            className="rounded-md px-5 py-2.5 font-sora text-sm font-bold text-purple-600
-                       transition-colors hover:bg-purple-50 cursor-pointer"
+            variant="cancel"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isSaving}
-            className="rounded-md bg-purple-600 px-6 py-2.5 font-sora text-sm font-bold text-purple-50
-                       transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer
-                       disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             {isSaving ? "Saving..." : "Save Changes"}
-          </button>
+          </Button>
         </div>
       </div>
 

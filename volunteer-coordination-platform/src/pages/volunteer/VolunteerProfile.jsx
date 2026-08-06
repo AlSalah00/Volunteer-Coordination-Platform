@@ -20,6 +20,7 @@ import {
   signOut,
 } from "../../services/auth";
 import { useToast } from "../../contexts/ToastContext";
+import Button from "../../components/common/Button";
 
 function InfoRow({ icon: Icon, label }) {
   if (!label) return null;
@@ -233,33 +234,29 @@ export default function VolunteerProfile() {
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <button
-              type="button"
+            <Button
               onClick={() => navigate("/volunteer/profile/edit")}
-              className="flex items-center gap-2 rounded-md bg-purple-600 px-5 py-2.5 font-sora text-sm font-bold text-purple-50 transition-all duration-200 hover:bg-purple-800 active:scale-95 cursor-pointer"
             >
               <Pencil className="h-4 w-4" />
               Edit Profile
-            </button>
+            </Button>
 
-            <button
-              type="button"
+            <Button
               onClick={handleResetPassword}
               disabled={isSendingReset}
-              className="flex items-center gap-2 rounded-md border-2 border-purple-600/20 px-5 py-2.5 font-sora text-sm font-bold text-purple-600 transition-colors hover:bg-purple-50 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+              variant="secondary"
             >
               <KeyRound className="h-4 w-4" />
               {isSendingReset ? "Sending..." : "Reset Password"}
-            </button>
+            </Button>
 
-            <button
-              type="button"
+            <Button
               onClick={() => setShowDeleteModal(true)}
-              className="flex items-center gap-2 rounded-md px-5 py-2.5 font-sora text-sm font-bold text-coral-600 transition-colors hover:bg-coral-50 cursor-pointer"
+              variant="danger"
             >
               <Trash2 className="h-4 w-4" />
               Delete Account
-            </button>
+            </Button>
           </div>
         </div>
       </div>
