@@ -24,6 +24,8 @@ import PublicLayout from "../components/activities/PublicExploreLayout";
 import VolunteerLayout from "../components/volunteer/VolunteerLayout";
 import VolunteerProfile from "../pages/volunteer/VolunteerProfile";
 import VolunteerProfileEdit from "../pages/volunteer/VolunteerProfileEdit";
+import Applicants from "../pages/organizer/Applicants";
+import Bookmarks from "../pages/volunteer/Bookmarks";
 
 export default function AppRoutes() {
   return (
@@ -52,6 +54,7 @@ export default function AppRoutes() {
         <Route path="explore" element={<ExploreActivities />} />
         <Route path="explore/:id" element={<ExploreActivityDetails />} />
         <Route path="my-activities" element={<MyActivities />} />
+        <Route path="bookmarks" element={<Bookmarks />} />
         <Route path="profile" element={<VolunteerProfile />} />
         <Route path="profile/edit" element={<VolunteerProfileEdit />} />
       </Route>
@@ -73,6 +76,7 @@ export default function AppRoutes() {
         <Route path="activities/:id" element={<ActivityDetails />} />
         <Route path="activities/:id/edit" element={<ActivityForm />} />
         <Route path="activities/:id/track" element={<ActivityTracking />} />
+        <Route path="activities/:id/applicants" element={<Applicants />} />
         <Route path="recruit" element={<Recruit />} />
         <Route path="reviews" element={<Reviews />} />
         <Route path="profile" element={<OrgProfile />} />

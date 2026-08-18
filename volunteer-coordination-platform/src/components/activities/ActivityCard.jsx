@@ -88,24 +88,6 @@ export default function ActivityCard({
           alt=""
           className="h-full w-full object-cover"
         />
-
-        {/* Bookmark Button (Volunteer Browsing Variant Only) */}
-        {variant === "volunteer" && (
-          <button
-            type="button"
-            onClick={handleBookmarkClick}
-            aria-label={isBookmarked ? "Remove bookmark" : "Bookmark activity"}
-            className="absolute top-2.5 left-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-purple-600 shadow-sm transition-all hover:bg-white hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <Bookmark
-              className={`h-4 w-4 transition-colors ${
-                isBookmarked
-                  ? "fill-purple-600 text-purple-600"
-                  : "text-purple-600"
-              }`}
-            />
-          </button>
-        )}
       </div>
 
       {/* Card Content */}
@@ -116,6 +98,26 @@ export default function ActivityCard({
             <h3 className="line-clamp-1 font-sora text-base font-bold text-purple-600 transition-colors">
               {title}
             </h3>
+
+            {/* Bookmark Button (Volunteer Browsing Variant Only) */}
+            {variant === "volunteer" && (
+              <button
+                type="button"
+                onClick={handleBookmarkClick}
+                aria-label={
+                  isBookmarked ? "Remove bookmark" : "Bookmark activity"
+                }
+                className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-purple-50 text-purple-600 transition-all hover:bg-purple-100 hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <Bookmark
+                  className={`h-4 w-4 transition-colors ${
+                    isBookmarked
+                      ? "fill-purple-600 text-purple-600"
+                      : "text-purple-600"
+                  }`}
+                />
+              </button>
+            )}
           </div>
 
           {/* Category & Type Tags */}
@@ -207,12 +209,12 @@ export default function ActivityCard({
               <ActionIcon icon={Pencil} label="Edit" onClick={onEdit} />
               <ActionIcon
                 icon={ClipboardCheck}
-                label="Track"
+                label="Team & Tasks"
                 onClick={onTrack}
               />
               <ActionIcon
                 icon={UserCheck}
-                label="Applicants"
+                label="Volunteers Waiting"
                 onClick={onViewApplicants}
               />
             </div>

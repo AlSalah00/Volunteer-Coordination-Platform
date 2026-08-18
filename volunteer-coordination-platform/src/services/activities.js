@@ -6,6 +6,10 @@ export async function getActivityById(id) {
   return supabase.from("activities").select("*, activity_tasks(*)").eq("id", id).single();
 }
 
+export async function getActivityName(id) {
+  return supabase.from("activities").select("name").eq("id", id).single();
+}
+
 export async function getOrganizerActivities() {
   const {
     data: { user },

@@ -5,16 +5,16 @@
  * cancelled versus if it's still upcoming.
  */
 export function getApplicationState({ applicationStatus, activityStatus }) {
-  if (applicationStatus === "rejected") {
+  if (applicationStatus === "rejected" || applicationStatus == "submitted" && activityStatus == "active" || applicationStatus == "submitted" && activityStatus == "completed") {
     return {
-      label: "Not this time",
+      label: "Not this time  :(",
       state: "The host went with other volunteers for this one.",
       whatsNext: "Don't be discouraged. There are plenty of other activities to explore.",
       showAiFeedback: false,
       action: {
         label: "Explore other activities",
         type: "NAVIGATE_EXPLORE",
-        variant: "secondary",
+        variant: "primary",
       }
     };
   }
@@ -28,7 +28,7 @@ export function getApplicationState({ applicationStatus, activityStatus }) {
       action: {
         label: "Explore other activities",
         type: "NAVIGATE_EXPLORE",
-        variant: "secondary",
+        variant: "primary",
       }
     };
   }
@@ -71,7 +71,7 @@ export function getApplicationState({ applicationStatus, activityStatus }) {
       action: {
         label: "Explore other activities",
         type: "NAVIGATE_EXPLORE",
-        variant: "secondary",
+        variant: "primary",
       }
     };
   }

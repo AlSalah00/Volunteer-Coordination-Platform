@@ -9,7 +9,7 @@ import { Compass, Calendar, Bookmark, Award } from "lucide-react";
 const volunteerNavItems = [
   { to: "/volunteer/explore", label: "Explore", icon: Compass },
   { to: "/volunteer/my-activities", label: "My Activities", icon: Calendar },
-  { to: "/volunteer/saved", label: "Bookmarks", icon: Bookmark },
+  { to: "/volunteer/bookmarks", label: "Bookmarks", icon: Bookmark },
   { to: "/volunteer/achievements", label: "Achievements", icon: Award },
 ];
 

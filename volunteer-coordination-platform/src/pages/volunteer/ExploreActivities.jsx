@@ -4,15 +4,19 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import ActivityCard from "../../components/activities/ActivityCard";
 import FilterModal from "../../components/common/FilterModal";
 import { getPublicActivities } from "../../services/activities";
+import { getUserBookmarkIds, toggleBookmark } from "../../services/bookmarks";
 import { mapActivityToCard } from "../../utils/activities";
 import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 
 export default function ExploreActivities() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showToast } = useToast();
   const { user } = useAuth();
 
   const [activities, setActivities] = useState([]);
+  const [bookmarkedIds, setBookmarkedIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState(""); // not wired up yet
@@ -34,22 +38,59 @@ export default function ExploreActivities() {
       setLoading(false);
     });
 
+    if (isVolunteerRoute) {
+      getUserBookmarkIds().then(({ data }) => {
+        if (!isMounted) return;
+        setBookmarkedIds(new Set(data || []));
+      });
+    }
+
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isVolunteerRoute]);
 
   const handleCardClick = (id) => {
     navigate(`${basePath}/${id}`);
   };
 
-  const handleApply = (id) => {
-    console.log("Current user:", user);
-    if (!user) {
-      navigate("/login");
-      return;
+  const handleToggleBookmark = async (activityId, e) => {
+    e.stopPropagation();
+    const isCurrentlyBookmarked = bookmarkedIds.has(activityId);
+
+    setBookmarkedIds((prev) => {
+      const next = new Set(prev);
+      if (isCurrentlyBookmarked) {
+        next.delete(activityId);
+      } else {
+        next.add(activityId);
+      }
+      return next;
+    });
+    const { error: toggleErr } = await toggleBookmark(
+      activityId,
+      isCurrentlyBookmarked,
+    );
+
+    if (toggleErr) {
+      showToast({ type: "error", message: "Failed to update bookmark." });
+      setBookmarkedIds((prev) => {
+        const next = new Set(prev);
+        if (isCurrentlyBookmarked) {
+          next.add(activityId);
+        } else {
+          next.delete(activityId);
+        }
+        return next;
+      });
+    } else {
+      showToast({
+        type: "success",
+        message: isCurrentlyBookmarked
+          ? "Removed from bookmarks."
+          : "Activity bookmarked!",
+      });
     }
-    navigate(`${basePath}/${id}`);
   };
 
   return (
@@ -109,9 +150,10 @@ export default function ExploreActivities() {
             <ActivityCard
               key={activity.id}
               {...activity}
-              variant="volunteer"
+              variant={isVolunteerRoute ? "volunteer" : "public"}
+              isBookmarked={bookmarkedIds.has(activity.id)}
+              onBookmark={(e) => handleToggleBookmark(activity.id, e)}
               onClick={() => handleCardClick(activity.id)}
-              onApply={() => handleApply(activity.id)}
             />
           ))}
         </div>

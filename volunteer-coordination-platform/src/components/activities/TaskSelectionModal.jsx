@@ -14,7 +14,8 @@ export default function TaskSelectionModal({
 }) {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
-  const { volunteerProfile } = useOutletContext();
+  const outletContext = useOutletContext();
+  const volunteerProfile = outletContext?.volunteerProfile ?? null;
 
   const handleConfirm = () => {
     if (!selectedTaskId) return;
@@ -28,12 +29,13 @@ export default function TaskSelectionModal({
       </h2>
 
       <p className="mb-5 font-inter text-sm text-purple-600/60">
-        Choose the one that fits you best. You can only apply to one for now.
+        Choose the one that fits you best. You can only choose one.
       </p>
 
       <div className="mb-6 flex max-h-80 flex-col gap-2.5 overflow-y-auto pr-1">
         {tasks.map((task) => {
-          const locked = !hasRequiredTitle(volunteerProfile.title, task.level);
+
+          const locked = !hasRequiredTitle(volunteerProfile?.title, task.level);
 
           const isSelected = selectedTaskId === task.id;
 

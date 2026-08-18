@@ -87,7 +87,7 @@ export default function ActivityTracking() {
           >
             ← Back
           </button>
-          <h1 className="font-sora text-3xl font-extrabold text-purple-600">{activity.name}</h1>
+          <h1 className="font-sora text-3xl font-extrabold text-purple-600">Team & Tasks - {activity.name}</h1>
         </div>
 
         <StatusDropdown status={status} onChange={handleStatusChange} />

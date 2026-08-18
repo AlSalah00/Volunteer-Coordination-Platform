@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Calendar, ClipboardList, Sparkles, Info } from "lucide-react";
 import Drawer from "../common/Drawer";
 import ConfirmModal from "../common/ConfirmModal";
-import { getApplicationDetails, withdrawApplication } from "../../services/applications";
+import { getApplicationDetails } from "../../services/applications";
 import { getApplicationState } from "../../utils/applicationState";
 import { formatDateTime } from "../../utils/activities";
 import { useToast } from "../../contexts/ToastContext";
+import Button from "../common/Button";
 
-export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClose, onWithdrawn }) {
+export default function ApplicationTrackingDrawer({
+  applicationId,
+  isOpen,
+  onClose,
+  onWithdrawn,
+}) {
+  const navigate = useNavigate();
   const { showToast } = useToast();
 
   const [details, setDetails] = useState(null);
@@ -48,11 +56,15 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
     setShowWithdrawConfirm(false);
 
     if (withdrawError) {
-      showToast({ type: "error", message: "We couldn't withdraw your request to join. Please try again." });
+      showToast({
+        type: "error",
+        message:
+          "Oh no! We couldn't withdraw your request to volunteer. Please try again.",
+      });
       return;
     }
 
-    showToast({ type: "success", message: "Request withdrawn." });
+    showToast({ type: "success", message: "Request to volunteer withdrawn." });
     onWithdrawn?.(applicationId);
     onClose();
   };
@@ -64,10 +76,39 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
       })
     : null;
 
+  const handleActionClick = () => {
+    if (!state?.action) return;
+
+    switch (state.action.type) {
+      case "WITHDRAW_APPLICATION":
+        setShowWithdrawConfirm(true);
+        break;
+
+      case "NAVIGATE_EXPLORE":
+        onClose();
+        navigate("/volunteer/explore");
+        break;
+
+      case "CHECK_IN":
+        onClose();
+        console.log(`Check-in`);
+        break;
+
+      case "NAVIGATE_BACK":
+        onClose();
+        break;
+
+      default:
+        console.warn(`Unhandled action type: ${state.action.type}`);
+    }
+  };
+
   return (
     <>
       <Drawer isOpen={isOpen} onClose={onClose} title="Activity State">
-        {loading && <p className="font-inter text-sm text-purple-600/60">Loading...</p>}
+        {loading && (
+          <p className="font-inter text-sm text-purple-600/60">Loading...</p>
+        )}
 
         {error && (
           <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
@@ -84,7 +125,7 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
               </h3>
               <div className="flex items-center gap-1.5 font-inter text-xs text-purple-600/50">
                 <Calendar className="h-3.5 w-3.5" />
-                Applied {formatDateTime(details.created_at)}
+                Request sent {formatDateTime(details.created_at)}
               </div>
             </div>
 
@@ -93,8 +134,12 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
               <p className="mb-1 font-sora text-xs font-bold uppercase tracking-wide text-purple-600/50">
                 Status
               </p>
-              <p className="mb-3 font-sora text-base font-extrabold text-purple-600">{state.label}</p>
-              <p className="font-inter text-sm leading-relaxed text-purple-600/80">{state.state}</p>
+              <p className="mb-3 font-sora text-base font-extrabold text-purple-600">
+                {state.label}
+              </p>
+              <p className="font-inter text-sm leading-relaxed text-purple-600/80">
+                {state.state}
+              </p>
             </div>
 
             {/* What's next */}
@@ -104,7 +149,9 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
                 <p className="mb-1 font-sora text-xs font-bold tracking-wide text-purple-600/50">
                   What's next
                 </p>
-                <p className="font-inter text-sm leading-relaxed text-purple-600/80">{state.whatsNext}</p>
+                <p className="font-inter text-sm leading-relaxed text-purple-600/80">
+                  {state.whatsNext}
+                </p>
               </div>
             </div>
 
@@ -141,16 +188,17 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
               </div>
             </div>
 
-            {/* Withdraw. Only while it's still a meaningful action */}
-            {state.showWithdrawButton && (
-              <button
-                type="button"
-                onClick={() => setShowWithdrawConfirm(true)}
-                className="mt-2 w-full rounded-md border-2 border-coral-600/20 py-2.5 font-sora text-sm font-bold text-coral-600
-                           transition-colors hover:bg-coral-50 cursor-pointer"
-              >
-                Withdraw Application
-              </button>
+            {/* Dynamic Action Button */}
+            {state.action && (
+              <div className="mt-4 pt-4 border-t border-purple-100">
+                <Button
+                  variant={state.action.variant}
+                  onClick={handleActionClick}
+                  className="w-full"
+                >
+                  {state.action.label}
+                </Button>
+              </div>
             )}
           </div>
         )}
@@ -159,7 +207,7 @@ export default function ApplicationTrackingDrawer({ applicationId, isOpen, onClo
       <ConfirmModal
         isOpen={showWithdrawConfirm}
         variant="danger"
-        title="Withdraw this application?"
+        title="Withdraw this volunteering request?"
         description="You can't undo this. If you change your mind, you'll need to apply again."
         confirmLabel="Withdraw"
         isLoading={isWithdrawing}
