@@ -85,7 +85,7 @@ export default function Applicants() {
     });
 
     // this only hit the network for the name if it wasn't handed to us.
-    // covers a page refresh, where state is gone. I want to display the name in the heading.
+    // covers a page refresh, where state is gone. I want to display the name in the heading, that's why.
     if (!activityName) {
       getActivityName(id).then(({ data }) => {
         if (isMounted && data) setActivityName(data.name);

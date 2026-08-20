@@ -51,7 +51,7 @@ export default function VolProfileDrawer({ isOpen, onClose, applicant, volunteer
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const activeVolunteerId = applicant?.volunteerId;
+  const activeVolunteerId = volunteerId ?? applicant?.volunteerId;
 
   useEffect(() => {
     if (!isOpen || !activeVolunteerId) {

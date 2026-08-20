@@ -31,7 +31,7 @@ export async function getPublicActivities() {
   return supabase
     .from("activities")
     .select("*, activity_tasks(capacity)")
-    .eq("status", "upcoming")
+    .gt("starts_at", new Date().toISOString())
     .order("starts_at", { ascending: true });
 }
 
@@ -242,6 +242,10 @@ export async function checkUserApplicationStatus(activityId) {
     data: Boolean(data),
     error,
   };
+}
+
+export async function updateActivityStatus(activityId, status) {
+  return supabase.from("activities").update({ status }).eq("id", activityId).select().single();
 }
  
 // Note this doesn't delete the uploaded photo from Supabase storage.

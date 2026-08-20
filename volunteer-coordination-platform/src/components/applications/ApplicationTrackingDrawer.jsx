@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Calendar, ClipboardList, Sparkles, Info } from "lucide-react";
 import Drawer from "../common/Drawer";
 import ConfirmModal from "../common/ConfirmModal";
+import QrScannerModal from "../common/QRScannerModal";
 import { getApplicationDetails } from "../../services/applications";
 import { getApplicationState } from "../../utils/applicationState";
 import { formatDateTime } from "../../utils/activities";
@@ -23,6 +24,8 @@ export default function ApplicationTrackingDrawer({
   const [error, setError] = useState("");
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !applicationId) {
@@ -73,8 +76,19 @@ export default function ApplicationTrackingDrawer({
     ? getApplicationState({
         applicationStatus: details.status,
         activityStatus: details.activities?.status,
+        checkInStatus: details.checked_in_at,
       })
     : null;
+
+  const handleScanSuccess = (scannedCode) => {
+    setShowScanner(false);
+    console.log("Scanned QR Code payload:", scannedCode);
+
+    showToast({
+      type: "success",
+      message: "QR code scanned! (Check-in pending database implementation)",
+    });
+  };
 
   const handleActionClick = () => {
     if (!state?.action) return;
@@ -91,7 +105,7 @@ export default function ApplicationTrackingDrawer({
 
       case "CHECK_IN":
         onClose();
-        console.log(`Check-in`);
+        setShowScanner(true);
         break;
 
       case "NAVIGATE_BACK":
@@ -131,9 +145,25 @@ export default function ApplicationTrackingDrawer({
 
             {/* Status */}
             <div className="rounded-xl border border-purple-200/60 bg-purple-50/50 p-4">
-              <p className="mb-1 font-sora text-xs font-bold uppercase tracking-wide text-purple-600/50">
-                Status
-              </p>
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <p className="font-sora text-xs font-bold uppercase tracking-wide text-purple-600/50">
+                  Status
+                </p>
+
+                {/* Check-In Badge */}
+                {state.showCompletion && (
+                <span
+                  className={`rounded-full px-2.5 py-0.5 font-sora text-[11px] font-bold border ${
+                    details.checked_in_at
+                      ? "border-teal-200/60 bg-teal-50 text-teal-700"
+                      : "border-amber-200/60 bg-amber-50 text-amber-800"
+                  }`}
+                >
+                  {details.checked_in_at ? "Checked-In" : "Not Checked-In"}
+                </span>
+                )}
+              </div>
+
               <p className="mb-3 font-sora text-base font-extrabold text-purple-600">
                 {state.label}
               </p>
@@ -172,10 +202,26 @@ export default function ApplicationTrackingDrawer({
 
             {/* Picked task */}
             <div>
-              <p className="mb-2 flex items-center gap-1.5 font-sora text-xs font-bold tracking-wide text-purple-600/50">
-                <ClipboardList className="h-3.5 w-3.5" />
-                Your Task
-              </p>
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="flex items-center gap-1.5 font-sora text-xs font-bold tracking-wide text-purple-600/50">
+                  <ClipboardList className="h-3.5 w-3.5" />
+                  Your Task
+                </p>
+
+                {/* Task Completion Badge */}
+                {state.showCompletion && (
+                <span
+                  className={`rounded-full px-2.5 py-0.5 font-sora text-[11px] font-bold border ${
+                    details.task_completed_at
+                      ? "border-teal-200/60 bg-teal-50 text-teal-700"
+                      : "border-amber-200/60 bg-amber-50 text-amber-800"
+                  }`}
+                >
+                  {details.task_completed_at ? "Completed" : "Incomplete"}
+                </span>
+                )}
+              </div>
+
               <div className="rounded-xl border border-purple-200/60 p-4">
                 <p className="mb-1 font-sora text-sm font-bold text-purple-600">
                   {details.activity_tasks?.name}
@@ -193,6 +239,7 @@ export default function ApplicationTrackingDrawer({
               <div className="mt-4 pt-4 border-t border-purple-100">
                 <Button
                   variant={state.action.variant}
+                  disabled={state.action.disabled}
                   onClick={handleActionClick}
                   className="w-full"
                 >
@@ -213,6 +260,12 @@ export default function ApplicationTrackingDrawer({
         isLoading={isWithdrawing}
         onConfirm={handleWithdraw}
         onCancel={() => setShowWithdrawConfirm(false)}
+      />
+
+      <QrScannerModal
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScan={handleScanSuccess}
       />
     </>
   );

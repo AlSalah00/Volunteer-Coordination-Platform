@@ -19,6 +19,16 @@ export function toDatetimeLocal(isoString) {
   )}:${pad(date.getMinutes())}`;
 }
 
+export function deriveStatusFromDates(startsAt, endsAt) {
+  const now = new Date();
+  const start = new Date(startsAt);
+  const end = new Date(endsAt);
+ 
+  if (now < start) return "upcoming";
+  if (now > end) return "completed";
+  return "active";
+}
+
 export function formatDateTime(dateInput) {
   const date = parseDate(dateInput);
   if (!date) return "";

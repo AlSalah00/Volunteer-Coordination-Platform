@@ -4,7 +4,7 @@
  * application means something different if the activity later gets
  * cancelled versus if it's still upcoming.
  */
-export function getApplicationState({ applicationStatus, activityStatus }) {
+export function getApplicationState({ applicationStatus, activityStatus, checkInStatus }) {
   if (applicationStatus === "rejected" || applicationStatus == "submitted" && activityStatus == "active" || applicationStatus == "submitted" && activityStatus == "completed") {
     return {
       label: "Not this time  :(",
@@ -54,9 +54,11 @@ export function getApplicationState({ applicationStatus, activityStatus }) {
       state: "This activity is happening right now!",
       whatsNext: "Head to your assigned task and give it your best. And don't forget to check in!",
       showAiFeedback: false,
+      showCompletion: true,
       action: {
-        label: "Check In!",
+        label: checkInStatus ? "Checked-in" : "Check-in!",
         type: "CHECK_IN",
+        disabled: checkInStatus ? true : false,
         variant: "primary",
       }
     };

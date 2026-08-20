@@ -4,7 +4,7 @@ export const STATUS_META = {
   // Activity Lifecycle Statuses
   upcoming: { bg: "bg-amber-50", text: "text-amber-800", dot: "bg-amber-400", label: "Upcoming" },
   active: { bg: "bg-teal-50", text: "text-teal-700", dot: "bg-teal-400", label: "Happening now" },
-  completed: { bg: "bg-slate-100", text: "text-slate-600", dot: "bg-slate-400", label: "Completed" },
+  completed: { bg: "bg-purple-50", text: "text-purple-600", dot: "bg-purple-400", label: "Completed" },
   cancelled: { bg: "bg-rose-50", text: "text-rose-700", dot: "bg-rose-500", label: "Cancelled" },
 
   // Application Statuses

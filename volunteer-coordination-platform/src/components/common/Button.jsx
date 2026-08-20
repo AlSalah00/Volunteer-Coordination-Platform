@@ -10,7 +10,7 @@ const variants = {
   danger:
     "border-2 border-coral-600/20 text-coral-600 hover:bg-coral-50 active:scale-95",
 
-  cancel:
+  outline:
     "rounded-md px-5 py-2.5 font-sora text-sm font-bold text-purple-600 transition-colors hover:bg-purple-50 cursor-pointer",  
 };
 

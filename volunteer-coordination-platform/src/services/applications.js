@@ -37,7 +37,7 @@ export async function getApplicationDetails(applicationId) {
   const [{ data: application, error: applicationError }, { data: feedback }] = await Promise.all([
     supabase
       .from("applications")
-      .select("id, status, created_at, activities(id, name, status), activity_tasks(name, description, level)")
+      .select("id, status, created_at, checked_in_at, task_completed_at, activities(id, name, status), activity_tasks(name, description, level)")
       .eq("id", applicationId)
       .single(),
     supabase
@@ -56,6 +56,48 @@ export async function getApplicationDetails(applicationId) {
     },
     error: null,
   };
+}
+
+export async function getActivityRoster(activityId) {
+  const { data, error } = await supabase
+    .from("applications")
+    .select(
+      "id, checked_in_at, task_completed_at, volunteer_id, profiles(avatar_url, volunteer_profiles(first_name, last_name)), activity_tasks(id, name, description, reward)"
+    )
+    .eq("activity_id", activityId)
+    .eq("status", "approved")
+    .order("created_at", { ascending: true });
+ 
+  if (error) return { data: null, error };
+ 
+  const flattened = data.map((row) => {
+    const volunteerProfile = row.profiles?.volunteer_profiles;
+    return {
+      applicationId: row.id,
+      volunteerId: row.volunteer_id,
+      volunteerName: volunteerProfile
+        ? `${volunteerProfile.first_name} ${volunteerProfile.last_name}`.trim()
+        : "Volunteer",
+      volunteerAvatarUrl: row.profiles?.avatar_url ?? null,
+      checkedInAt: row.checked_in_at,
+      taskId: row.activity_tasks?.id ?? null,
+      taskName: row.activity_tasks?.name ?? "Unspecified task",
+      taskDescription: row.activity_tasks?.description ?? null,
+      taskReward: row.activity_tasks?.reward ?? 0,
+      taskCompletedAt: row.task_completed_at,
+    };
+  });
+ 
+  return { data: flattened, error: null };
+}
+
+export async function setTaskCompletion(applicationId, isComplete) {
+  return supabase
+    .from("applications")
+    .update({ task_completed_at: isComplete ? new Date().toISOString() : null })
+    .eq("id", applicationId)
+    .select()
+    .single();
 }
  
 export async function withdrawApplication(applicationId) {
