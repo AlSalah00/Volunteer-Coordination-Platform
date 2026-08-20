@@ -202,11 +202,6 @@ export default function VolunteerProfile() {
       {/* Banner + Avatar + Header Info */}
       <div className="relative overflow-hidden rounded-2xl border border-purple-200/60 bg-white">
         <div className="relative h-36 overflow-hidden bg-purple-600">
-          <div
-            aria-hidden="true"
-            className="absolute -bottom-16 -left-16 h-64 w-64 bg-purple-200/30 blur-2xl"
-            style={{ borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" }}
-          />
         </div>
 
         <div className="absolute left-8 top-24">
@@ -224,7 +219,6 @@ export default function VolunteerProfile() {
               {fullName}
             </h1>
 
-            {/* TODO: Replace hardcoded level and title with XP calculation mapping */}
             <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 border border-amber-200/60">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
               <span className="font-sora text-xs font-bold text-amber-700">

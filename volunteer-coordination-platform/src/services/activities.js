@@ -38,7 +38,7 @@ export async function getPublicActivities() {
 export async function getPublicActivityById(id) {
   const { data, error } = await supabase
     .from("activities")
-    .select("*, activity_tasks(*), profiles(avatar_url, organizer_profiles(org_name))")
+    .select("*, activity_tasks(*), profiles(avatar_url, bio, contact_number, email, organizer_profiles(*))")
     .eq("id", id)
     .single();
 
@@ -50,8 +50,15 @@ export async function getPublicActivityById(id) {
   return {
     data: {
       ...data,
-      organizer_name: orgProfile?.org_name ?? "Organizer",
+      organizer_name: orgProfile?.org_name ?? "Unknown Organizer",
       organizer_avatar_url: data.profiles?.avatar_url ?? null,
+      bio: data.profiles?.bio ?? null,
+      contact_number: data.profiles?.contact_number ?? null,
+      email: data.profiles?.email ?? null,
+      address: orgProfile?.address ?? null,
+      registration_no: orgProfile?.registration_number ?? null,
+      verification: orgProfile?.verification_status ?? null,
+      rating: orgProfile?.average_rating ?? null
     },
     error: null,
   };

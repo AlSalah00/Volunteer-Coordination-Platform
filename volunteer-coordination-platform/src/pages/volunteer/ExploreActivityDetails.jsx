@@ -21,6 +21,7 @@ import { isVolunteerProfileComplete } from "../../services/profile";
 import { submitApplication } from "../../services/applications";
 import { checkUserApplicationStatus } from "../../services/activities";
 import Button from "../../components/common/Button";
+import OrgProfileDrawer from "../../components/organizer/OrgProfileDrawer";
 
 export default function ExploreActivityDetails() {
   const { id } = useParams();
@@ -34,6 +35,8 @@ export default function ExploreActivityDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hasApplied, setHasApplied] = useState(false);
+
+  const [showOrgDrawer, setShowOrgDrawer] = useState(false);
 
   const [showIncompleteProfileModal, setShowIncompleteProfileModal] =
     useState(false);
@@ -108,7 +111,8 @@ export default function ExploreActivityDetails() {
     setHasApplied(true);
     showToast({
       type: "success",
-      message: "Thanks for raising your hand! Your request to participate has been sent to the host.",
+      message:
+        "Thanks for raising your hand! Your request to volunteer has been sent to the host.",
     });
     navigate("/volunteer/my-activities");
   };
@@ -165,9 +169,10 @@ export default function ExploreActivityDetails() {
               <StatusBadge status={activity.status} />
             </div>
 
-            <Link
-              to={`/organizers/${activity.organizer_id}`}
-              className="mb-5 flex w-fit items-center gap-2.5 rounded-full py-1 pr-3 transition-colors hover:bg-purple-50"
+            <button
+              type="button"
+              onClick={() => setShowOrgDrawer(true)}
+              className="mb-5 flex w-fit items-center gap-2.5 rounded-full py-1 pr-3 transition-colors hover:bg-purple-50 cursor-pointer"
             >
               <Avatar
                 src={activity.organizer_avatar_url}
@@ -177,7 +182,7 @@ export default function ExploreActivityDetails() {
               <span className="font-inter text-sm font-medium text-purple-600">
                 {activity.organizer_name}
               </span>
-            </Link>
+            </button>
 
             <div className="mb-5 flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-purple-50 px-2.5 py-1 font-sora text-xs font-bold text-purple-600">
@@ -285,6 +290,12 @@ export default function ExploreActivityDetails() {
         tasks={activity.activity_tasks ?? []}
         isSubmitting={isSubmittingApplication}
         onConfirm={handleConfirmApplication}
+      />
+
+      <OrgProfileDrawer
+        isOpen={showOrgDrawer}
+        onClose={() => setShowOrgDrawer(false)}
+        organizer={activity}
       />
     </div>
   );

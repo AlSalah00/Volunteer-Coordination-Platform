@@ -4,7 +4,7 @@ export async function getActivityApplicants(activityId) {
   const { data, error } = await supabase
     .from("applications")
     .select(
-      "id, status, created_at, volunteer_id, profiles(avatar_url, volunteer_profiles(first_name, last_name)), activity_tasks(name), ai_evaluations(match_result, organizer_reasoning)"
+      "id, status, created_at, volunteer_id, profiles(avatar_url, volunteer_profiles(*)), activity_tasks(name), ai_evaluations(match_result, organizer_reasoning)"
     )
     .eq("activity_id", activityId);
  
@@ -19,7 +19,7 @@ export async function getActivityApplicants(activityId) {
       volunteerId: row.volunteer_id,
       volunteerName: volunteerProfile
         ? `${volunteerProfile.first_name} ${volunteerProfile.last_name}`.trim()
-        : "Volunteer",
+        : "Unknown Volunteer",
       volunteerAvatarUrl: row.profiles?.avatar_url ?? null,
       taskName: row.activity_tasks?.name ?? "Unspecified task",
       matchResult: row.ai_evaluations?.match_result ?? null,

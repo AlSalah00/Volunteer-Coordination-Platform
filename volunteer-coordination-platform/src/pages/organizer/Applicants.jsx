@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ApplicantCard from "../../components/applicants/ApplicantCard";
 import ConfirmModal from "../../components/common/ConfirmModal";
-import { getActivityApplicants, updateApplicationStatus } from "../../services/applications";
+import {
+  getActivityApplicants,
+  updateApplicationStatus,
+} from "../../services/applications";
 import { getActivityName } from "../../services/activities";
 import { useToast } from "../../contexts/ToastContext";
+import VolProfileDrawer from "../../components/volunteer/VolProfileDrawer";
 
 const MODAL_COPY = {
   accept: {
@@ -24,14 +28,16 @@ const MODAL_COPY = {
   revoke: {
     variant: "danger",
     title: "Remove from the team?",
-    description: "They'll lose their spot in this activity and move back to pending review.",
+    description:
+      "They'll lose their spot in this activity and move back to pending review.",
     confirmLabel: "Remove",
     nextStatus: "submitted",
   },
   reconsider: {
     variant: "default",
     title: "Reconsider this volunteer?",
-    description: "They'll move back to pending review, and you can decide again later.",
+    description:
+      "They'll move back to pending review, and you can decide again later.",
     confirmLabel: "Reconsider",
     nextStatus: "submitted",
   },
@@ -40,7 +46,9 @@ const MODAL_COPY = {
 function StatBlock({ label, value }) {
   return (
     <div className="rounded-xl border border-purple-200/60 bg-white p-4 text-center">
-      <p className="font-sora text-2xl font-extrabold text-purple-600">{value}</p>
+      <p className="font-sora text-2xl font-extrabold text-purple-600">
+        {value}
+      </p>
       <p className="font-inter text-xs text-purple-600/60">{label}</p>
     </div>
   );
@@ -52,8 +60,11 @@ export default function Applicants() {
   const location = useLocation();
   const { showToast } = useToast();
 
-  const [activityName, setActivityName] = useState(location.state?.activityName ?? null);
+  const [activityName, setActivityName] = useState(
+    location.state?.activityName ?? null,
+  );
   const [applicants, setApplicants] = useState([]);
+  const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   // { type: "accept" | "reject" | "revoke" | "reconsider", applicant } or null
@@ -92,17 +103,25 @@ export default function Applicants() {
     const { nextStatus } = MODAL_COPY[confirmAction.type];
 
     setIsUpdating(true);
-    const { error: updateError } = await updateApplicationStatus(confirmAction.applicant.id, nextStatus);
+    const { error: updateError } = await updateApplicationStatus(
+      confirmAction.applicant.id,
+      nextStatus,
+    );
     setIsUpdating(false);
     setConfirmAction(null);
 
     if (updateError) {
-      showToast({ type: "error", message: "Couldn't update your decision. Please try again." });
+      showToast({
+        type: "error",
+        message: "Couldn't update your decision. Please try again.",
+      });
       return;
     }
 
     setApplicants((prev) =>
-      prev.map((a) => (a.id === confirmAction.applicant.id ? { ...a, status: nextStatus } : a))
+      prev.map((a) =>
+        a.id === confirmAction.applicant.id ? { ...a, status: nextStatus } : a,
+      ),
     );
     showToast({ type: "success", message: "Decision updated." });
   };
@@ -140,7 +159,9 @@ export default function Applicants() {
       )}
 
       {loading && (
-        <p className="font-inter text-sm text-purple-600/60">Loading volunteers...</p>
+        <p className="font-inter text-sm text-purple-600/60">
+          Loading volunteers...
+        </p>
       )}
 
       {error && (
@@ -150,7 +171,9 @@ export default function Applicants() {
       )}
 
       {!loading && !error && applicants.length === 0 && (
-        <p className="font-inter text-sm text-purple-600/60">No one has requested to volunteer in this activity yet.</p>
+        <p className="font-inter text-sm text-purple-600/60">
+          No one has requested to volunteer in this activity yet.
+        </p>
       )}
 
       <div className="flex flex-col gap-4">
@@ -158,10 +181,13 @@ export default function Applicants() {
           <ApplicantCard
             key={applicant.id}
             applicant={applicant}
+            onSelectProfile={setSelectedApplicant}
             onAccept={(a) => setConfirmAction({ type: "accept", applicant: a })}
             onReject={(a) => setConfirmAction({ type: "reject", applicant: a })}
             onRevoke={(a) => setConfirmAction({ type: "revoke", applicant: a })}
-            onReconsider={(a) => setConfirmAction({ type: "reconsider", applicant: a })}
+            onReconsider={(a) =>
+              setConfirmAction({ type: "reconsider", applicant: a })
+            }
           />
         ))}
       </div>
@@ -175,6 +201,12 @@ export default function Applicants() {
         isLoading={isUpdating}
         onConfirm={handleConfirm}
         onCancel={() => setConfirmAction(null)}
+      />
+
+      <VolProfileDrawer
+        isOpen={Boolean(selectedApplicant)}
+        onClose={() => setSelectedApplicant(null)}
+        applicant={selectedApplicant}
       />
     </div>
   );

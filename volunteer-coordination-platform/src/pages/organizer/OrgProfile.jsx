@@ -109,11 +109,6 @@ export default function OrgProfile() {
       {/* Banner + avatar + actions */}
       <div className="relative mb-6 overflow-hidden rounded-2xl border border-purple-200/60 bg-white">
         <div className="relative h-36 overflow-hidden bg-purple-600">
-          <div
-            aria-hidden="true"
-            className="absolute -bottom-16 -left-16 h-64 w-64 bg-purple-200/30 blur-2xl"
-            style={{ borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" }}
-          />
         </div>
 
         <div className="absolute left-8 top-24">
@@ -142,7 +137,9 @@ export default function OrgProfile() {
               <span className="flex items-center gap-1.5 font-inter text-sm text-purple-600/80">
                 <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                 <span className="font-sora font-bold text-purple-600">
-                  {organizerProfile.average_rating.toFixed(1)}
+                  {organizerProfile.average_rating
+                  ? `${Number(organizerProfile.average_rating).toFixed(1)} Rating`
+                  : "New Host"}
                 </span>
               </span>
             ) : (
@@ -184,7 +181,7 @@ export default function OrgProfile() {
       {organizerProfile?.bio && (
         <section className="mb-6 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
           <h2 className="mb-3 font-sora text-lg font-extrabold text-purple-600">
-            About
+            About Organization
           </h2>
           <p className="font-inter text-sm leading-relaxed text-purple-600/70">
             {organizerProfile.bio}
@@ -195,7 +192,7 @@ export default function OrgProfile() {
       {/* Contact info */}
       <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
         <h2 className="mb-5 font-sora text-lg font-extrabold text-purple-600">
-          Contact Info
+          Contact & Info
         </h2>
         <div className="flex flex-col gap-4">
           <InfoRow icon={Mail} label={organizerProfile.email} />

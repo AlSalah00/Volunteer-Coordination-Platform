@@ -5,17 +5,18 @@ import Button from "../common/Button";
 import ApplicantStatusBadge from "./ApplicantStatusBadge";
 import MatchBadge from "./MatchBadge";
 
-export default function ApplicantCard({ applicant, onAccept, onReject, onRevoke, onReconsider }) {
+export default function ApplicantCard({ applicant, onSelectProfile, onAccept, onReject, onRevoke, onReconsider }) {
   return (
     <div className="rounded-2xl border border-purple-200/60 bg-white p-5">
       <div className="flex items-center justify-between gap-4">
-        <Link
-          to={`/volunteers/${applicant.volunteerId}`}
-          className="-ml-1 flex items-center gap-3 rounded-full py-1 pr-3 transition-colors hover:bg-purple-50"
+        <button
+          type="button"
+          onClick={() => onSelectProfile(applicant)}
+          className="-ml-1 flex cursor-pointer items-center gap-3 rounded-full py-1 pr-3 transition-colors hover:bg-purple-50 text-left"
         >
           <Avatar src={applicant.volunteerAvatarUrl} name={applicant.volunteerName} size={44} />
           <span className="font-sora text-sm font-bold text-purple-600">{applicant.volunteerName}</span>
-        </Link>
+        </button>
 
         <ApplicantStatusBadge status={applicant.status} />
       </div>
