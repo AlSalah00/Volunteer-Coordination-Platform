@@ -42,7 +42,7 @@ export default function OrgProfileDrawer({ isOpen, onClose, organizer }) {
           <div className="mt-2.5 flex flex-wrap items-center justify-center gap-2">
             {/* Rating Badge */}
             <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 backdrop-blur-md">
-              <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+              <Star className="h-3.5 w-3.5 text-white fill-white" />
               <span className="font-sora text-xs font-bold text-white">
                 {organizer.rating
                   ? `${Number(organizer.rating).toFixed(1)} Rating`
@@ -54,7 +54,7 @@ export default function OrgProfileDrawer({ isOpen, onClose, organizer }) {
             {organizer.verification === "verified" && (
               <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 backdrop-blur-md">
                 <ShieldCheck className="h-3.5 w-3.5 text-teal-300" />
-                <span className="font-sora text-xs font-bold text-emerald-200">
+                <span className="font-sora text-xs font-bold text-teal-200">
                   Verified
                 </span>
               </div>

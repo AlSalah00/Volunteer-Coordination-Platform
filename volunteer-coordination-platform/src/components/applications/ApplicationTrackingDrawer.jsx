@@ -1,11 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, ClipboardList, Sparkles, Info } from "lucide-react";
 import Drawer from "../common/Drawer";
 import ConfirmModal from "../common/ConfirmModal";
 import QrScannerModal from "../common/QRScannerModal";
-import { getApplicationDetails } from "../../services/applications";
+import ReviewModal from "../common/ReviewModal";
+import {
+  getApplicationDetails,
+  withdrawApplication,
+  checkInByToken,
+} from "../../services/applications";
 import { getApplicationState } from "../../utils/applicationState";
+import { checkHasReviewed, submitReview } from "../../services/reviews";
 import { formatDateTime } from "../../utils/activities";
 import { useToast } from "../../contexts/ToastContext";
 import Button from "../common/Button";
@@ -25,11 +31,19 @@ export default function ApplicationTrackingDrawer({
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
 
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
+  const [userReview, setUserReview] = useState(null);
+  const [reviewTarget, setReviewTarget] = useState(null);
+
   const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !applicationId) {
       setDetails(null);
+      setHasReviewed(false);
+      setUserReview(null);
       return;
     }
 
@@ -37,15 +51,27 @@ export default function ApplicationTrackingDrawer({
     setLoading(true);
     setError("");
 
-    getApplicationDetails(applicationId).then(({ data, error: fetchError }) => {
-      if (!isMounted) return;
-      if (fetchError || !data) {
-        setError("Couldn't load this application.");
-      } else {
-        setDetails(data);
-      }
-      setLoading(false);
-    });
+    getApplicationDetails(applicationId).then(
+      async ({ data, error: fetchError }) => {
+        if (!isMounted) return;
+        if (fetchError || !data) {
+          setError("We couldn't load this application.");
+        } else {
+          setDetails(data);
+
+          if (data.activities?.id) {
+            const { hasReviewed: reviewed, review } = await checkHasReviewed(
+              data.activities.id,
+            );
+            if (isMounted) {
+              setHasReviewed(reviewed);
+              setUserReview(review);
+            }
+          }
+        }
+        setLoading(false);
+      },
+    );
 
     return () => {
       isMounted = false;
@@ -62,7 +88,7 @@ export default function ApplicationTrackingDrawer({
       showToast({
         type: "error",
         message:
-          "Oh no! We couldn't withdraw your request to volunteer. Please try again.",
+          "We couldn't withdraw your request to volunteer. Please try again.",
       });
       return;
     }
@@ -77,17 +103,67 @@ export default function ApplicationTrackingDrawer({
         applicationStatus: details.status,
         activityStatus: details.activities?.status,
         checkInStatus: details.checked_in_at,
+        reviewStatus: hasReviewed,
       })
     : null;
 
-  const handleScanSuccess = (scannedCode) => {
-    setShowScanner(false);
-    console.log("Scanned QR Code payload:", scannedCode);
+  const handleScan = useCallback(
+    async (decodedText) => {
+      setShowScanner(false);
+
+      let token;
+      try {
+        token = new URL(decodedText).pathname.split("/").filter(Boolean).pop();
+      } catch {
+        token = decodedText.split("/").filter(Boolean).pop();
+      }
+
+      const { error: checkInError } = await checkInByToken(token);
+
+      if (checkInError) {
+        showToast({
+          type: "error",
+          message: "We couldn't check you in. Please try scanning again.",
+        });
+        return;
+      }
+
+      showToast({ type: "success", message: "You're checked in!" });
+      setDetails((prev) =>
+        prev ? { ...prev, checked_in_at: new Date().toISOString() } : prev,
+      );
+    },
+    [showToast],
+  );
+
+  const handleReviewSubmit = async ({ rating, comment }) => {
+    setIsSubmitting(true);
+
+    const { error } = await submitReview({
+      activityId: reviewTarget?.activityId,
+      organizerId: reviewTarget?.organizerId,
+      rating,
+      comment,
+    });
+
+    setIsSubmitting(false);
+
+    if (error) {
+      showToast({
+        type: "error",
+        message: "We couldn't submit your review. Please try again.",
+      });
+      return;
+    }
 
     showToast({
       type: "success",
-      message: "QR code scanned! (Check-in pending database implementation)",
+      message: "Review submitted. Thank you for your feedback!",
     });
+
+    setHasReviewed(true);
+    setUserReview({ rating, comment });
+    setIsReviewModalOpen(false);
   };
 
   const handleActionClick = () => {
@@ -106,6 +182,22 @@ export default function ApplicationTrackingDrawer({
       case "CHECK_IN":
         onClose();
         setShowScanner(true);
+        break;
+
+      case "REVIEW":
+
+        const actId = details?.activities?.id;
+        const orgId = details?.activities?.organizer_id;
+
+        setReviewTarget({
+          activityId: actId,
+          organizerId: orgId,
+          title: details?.activities?.name,
+          hasReviewed,
+          userReview,
+        });
+        onClose();
+        setIsReviewModalOpen(true);
         break;
 
       case "NAVIGATE_BACK":
@@ -152,15 +244,15 @@ export default function ApplicationTrackingDrawer({
 
                 {/* Check-In Badge */}
                 {state.showCompletion && (
-                <span
-                  className={`rounded-full px-2.5 py-0.5 font-sora text-[11px] font-bold border ${
-                    details.checked_in_at
-                      ? "border-teal-200/60 bg-teal-50 text-teal-700"
-                      : "border-amber-200/60 bg-amber-50 text-amber-800"
-                  }`}
-                >
-                  {details.checked_in_at ? "Checked-In" : "Not Checked-In"}
-                </span>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 font-sora text-[11px] font-bold border ${
+                      details.checked_in_at
+                        ? "border-teal-200/60 bg-teal-50 text-teal-700"
+                        : "border-amber-200/60 bg-amber-50 text-amber-800"
+                    }`}
+                  >
+                    {details.checked_in_at ? "Checked-In" : "Not Checked-In"}
+                  </span>
                 )}
               </div>
 
@@ -210,15 +302,15 @@ export default function ApplicationTrackingDrawer({
 
                 {/* Task Completion Badge */}
                 {state.showCompletion && (
-                <span
-                  className={`rounded-full px-2.5 py-0.5 font-sora text-[11px] font-bold border ${
-                    details.task_completed_at
-                      ? "border-teal-200/60 bg-teal-50 text-teal-700"
-                      : "border-amber-200/60 bg-amber-50 text-amber-800"
-                  }`}
-                >
-                  {details.task_completed_at ? "Completed" : "Incomplete"}
-                </span>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 font-sora text-[11px] font-bold border ${
+                      details.task_completed_at
+                        ? "border-teal-200/60 bg-teal-50 text-teal-700"
+                        : "border-amber-200/60 bg-amber-50 text-amber-800"
+                    }`}
+                  >
+                    {details.task_completed_at ? "Completed" : "Incomplete"}
+                  </span>
                 )}
               </div>
 
@@ -265,7 +357,17 @@ export default function ApplicationTrackingDrawer({
       <QrScannerModal
         isOpen={showScanner}
         onClose={() => setShowScanner(false)}
-        onScan={handleScanSuccess}
+        onScan={handleScan}
+      />
+
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        onSubmit={handleReviewSubmit}
+        activityTitle={reviewTarget?.title}
+        isSubmitting={isSubmitting}
+        readOnly={reviewTarget?.hasReviewed}
+        existingReview={reviewTarget?.userReview}
       />
     </>
   );

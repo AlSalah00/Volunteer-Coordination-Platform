@@ -5,6 +5,7 @@ import StatusBadge from "../../components/activities/StatusBadge";
 import TaskChecklistItem from "../../components/activities/TaskChecklistItem";
 import Avatar from "../../components/common/Avatar";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import AttendanceQrModal from "../../components/activities/AttendanceQrModal";
 import Button from "../../components/common/Button";
 import {
   getActivityById,
@@ -57,6 +58,7 @@ export default function ActivityTracking() {
 
   const [confirmAction, setConfirmAction] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -157,14 +159,8 @@ export default function ActivityTracking() {
 
   const copy = confirmAction ? MODAL_COPY[confirmAction.type] : null;
 
-  const handleVolunteerClick = (volunteerId) => {
-    // TODO: opens the volunteer's profile in a drawer.
-    console.log("Open profile for volunteer:", volunteerId);
-  };
-
   const handleOpenQrModal = () => {
-    // TODO: real QR flow (activity.checkin_token) comes later.
-    alert("Opening Attendance QR Code modal...");
+    setShowQrModal(true);
   };
 
   if (loading) {
@@ -424,6 +420,13 @@ export default function ActivityTracking() {
         isLoading={isUpdating}
         onConfirm={handleConfirm}
         onCancel={() => setConfirmAction(null)}
+      />
+
+      <AttendanceQrModal
+        isOpen={showQrModal}
+        onClose={() => setShowQrModal(false)}
+        checkinUrl={`${window.location.origin}/checkin/${activity.checkin_token}`}
+        activityName={activity.name}
       />
 
       <VolProfileDrawer

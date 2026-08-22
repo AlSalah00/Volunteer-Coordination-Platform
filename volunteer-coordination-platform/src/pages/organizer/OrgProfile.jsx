@@ -135,7 +135,7 @@ export default function OrgProfile() {
           <div className="mt-1.5">
             {organizerProfile?.average_rating != null ? (
               <span className="flex items-center gap-1.5 font-inter text-sm text-purple-600/80">
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                <Star className="h-4 w-4 fill-purple-600 text-purple-600" />
                 <span className="font-sora font-bold text-purple-600">
                   {organizerProfile.average_rating
                   ? `${Number(organizerProfile.average_rating).toFixed(1)} Rating`

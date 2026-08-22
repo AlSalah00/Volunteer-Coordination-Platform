@@ -4,13 +4,14 @@
  * application means something different if the activity later gets
  * cancelled versus if it's still upcoming.
  */
-export function getApplicationState({ applicationStatus, activityStatus, checkInStatus }) {
+export function getApplicationState({ applicationStatus, activityStatus, checkInStatus, reviewStatus }) {
   if (applicationStatus === "rejected" || applicationStatus == "submitted" && activityStatus == "active" || applicationStatus == "submitted" && activityStatus == "completed") {
     return {
       label: "Not this time  :(",
       state: "The host went with other volunteers for this one.",
       whatsNext: "Don't be discouraged. There are plenty of other activities to explore.",
       showAiFeedback: false,
+      showCompletion: false,
       action: {
         label: "Explore other activities",
         type: "NAVIGATE_EXPLORE",
@@ -25,6 +26,7 @@ export function getApplicationState({ applicationStatus, activityStatus, checkIn
       state: "Unfortunately, this activity was cancelled by the host.",
       whatsNext: "No action needed on your part. Feel free to explore other activities.",
       showAiFeedback: false,
+      showCompletion: false,
       action: {
         label: "Explore other activities",
         type: "NAVIGATE_EXPLORE",
@@ -39,6 +41,7 @@ export function getApplicationState({ applicationStatus, activityStatus, checkIn
       state: "You've raised your hand for this!",
       whatsNext: "Sit tight, the host is finalizing the team and will update you soon.",
       showAiFeedback: true,
+      showCompletion: false,
       action: {
         label: "Withdraw Application",
         type: "WITHDRAW_APPLICATION",
@@ -56,7 +59,7 @@ export function getApplicationState({ applicationStatus, activityStatus, checkIn
       showAiFeedback: false,
       showCompletion: true,
       action: {
-        label: checkInStatus ? "Checked-in" : "Check-in!",
+        label: checkInStatus ? "You're Checked-In" : "Check-In!",
         type: "CHECK_IN",
         disabled: checkInStatus ? true : false,
         variant: "primary",
@@ -68,11 +71,12 @@ export function getApplicationState({ applicationStatus, activityStatus, checkIn
     return {
       label: "Completed",
       state: "You completed this activity. Nice work!",
-      whatsNext: "Check back for new activities to join.",
+      whatsNext: "Optionally, you can now send a review of this activity to the host.",
       showAiFeedback: false,
+      showCompletion: true,
       action: {
-        label: "Explore other activities",
-        type: "NAVIGATE_EXPLORE",
+        label: reviewStatus ? "View Your Review" : "Review",
+        type: "REVIEW",
         variant: "primary",
       }
     };
@@ -84,6 +88,7 @@ export function getApplicationState({ applicationStatus, activityStatus, checkIn
     state: "Spot confirmed! You're officially part of the team.",
     whatsNext: "Mark your calendar, we can't wait to see you there.",
     showAiFeedback: false,
+    showCompletion: false,
     action: {
       label: "Back",
       type: "NAVIGATE_BACK",

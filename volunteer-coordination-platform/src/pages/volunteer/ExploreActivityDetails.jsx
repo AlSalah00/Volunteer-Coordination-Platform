@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   useParams,
   useNavigate,
-  Link,
   useOutletContext,
 } from "react-router-dom";
 import { Calendar, MapPin, Globe, ClipboardList } from "lucide-react";

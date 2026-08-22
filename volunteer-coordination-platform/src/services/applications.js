@@ -37,7 +37,7 @@ export async function getApplicationDetails(applicationId) {
   const [{ data: application, error: applicationError }, { data: feedback }] = await Promise.all([
     supabase
       .from("applications")
-      .select("id, status, created_at, checked_in_at, task_completed_at, activities(id, name, status), activity_tasks(name, description, level)")
+      .select("id, status, created_at, checked_in_at, task_completed_at, activities(id, name, status, organizer_id), activity_tasks(name, description, level)")
       .eq("id", applicationId)
       .single(),
     supabase
@@ -129,4 +129,48 @@ export async function submitApplication({ activityId, taskId }) {
 
 export async function updateApplicationStatus(applicationId, status) {
   return supabase.from("applications").update({ status }).eq("id", applicationId).select().single();
+}
+
+export async function checkInToActivity(applicationId) {
+  return supabase
+    .from("applications")
+    .update({ checked_in_at: new Date().toISOString() })
+    .eq("id", applicationId)
+    .select()
+    .single();
+}
+
+export async function checkInByToken(checkinToken) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+ 
+  if (userError || !user) {
+    return { data: null, error: userError ?? new Error("Not signed in.") };
+  }
+ 
+  const { data: activity, error: activityError } = await supabase
+    .from("activities")
+    .select("id")
+    .eq("checkin_token", checkinToken)
+    .single();
+ 
+  if (activityError || !activity) {
+    return { data: null, error: activityError ?? new Error("Invalid check-in link.") };
+  }
+ 
+  const { data: application, error: applicationError } = await supabase
+    .from("applications")
+    .select("id")
+    .eq("activity_id", activity.id)
+    .eq("volunteer_id", user.id)
+    .eq("status", "approved")
+    .single();
+ 
+  if (applicationError || !application) {
+    return { data: null, error: applicationError ?? new Error("You're not approved for this activity.") };
+  }
+ 
+  return checkInToActivity(application.id);
 }
