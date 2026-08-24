@@ -16,6 +16,7 @@ const volunteerNavItems = [
 export default function VolunteerLayout() {
   const [volunteerProfile, setVolunteerProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const navigate = useNavigate();
 
   const fetchProfile = async () => {
     const { data } = await getVolunteerProfile();

@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ActivityCard from "../../components/activities/ActivityCard";
 import { getOrganizerActivities } from "../../services/activities";
 import { mapActivityToCard } from "../../utils/activities";
+import Button from "../../components/common/Button";
 
 export default function Activities() {
   const navigate = useNavigate();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { isVerified, loadingProfile } = useOutletContext();
+
+  const canCreateActivity = !loadingProfile && isVerified;
 
   useEffect(() => {
     let isMounted = true;
@@ -36,13 +40,23 @@ export default function Activities() {
         <h1 className="font-sora text-3xl font-extrabold text-purple-600">
           Activities
         </h1>
-        <Link
-          to="new"
-          className="flex items-center gap-2 rounded-md bg-purple-600 px-5 py-2.5 font-sora text-sm font-bold text-purple-50
-                     transition-all duration-200 hover:bg-purple-800 active:scale-95"
-        >
-          + Create Activity
-        </Link>
+        {canCreateActivity ? (
+          <Link to="new">
+            <Button variant="primary">+ Create Activity</Button>
+          </Link>
+        ) : (
+          <Button
+            variant="primary"
+            disabled={true}
+            title={
+              loadingProfile
+                ? "Loading profile..."
+                : "Activity Creation Locked"
+            }
+          >
+            + Create Activity
+          </Button>
+        )}
       </div>
 
       {loading && (

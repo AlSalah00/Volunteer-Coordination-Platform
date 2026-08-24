@@ -111,7 +111,7 @@ export default function Bookmarks() {
               {...activity}
               variant="volunteer"
               isBookmarked={true}
-              onBookmarkClick={(e) => handleRemoveBookmark(activity.id, e)}
+              onBookmark={(e) => handleRemoveBookmark(activity.id, e)}
               onClick={() => handleCardClick(activity.id)}
             />
           ))}

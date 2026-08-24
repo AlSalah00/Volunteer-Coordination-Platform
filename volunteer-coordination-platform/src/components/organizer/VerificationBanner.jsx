@@ -6,7 +6,7 @@ export default function VerificationBanner() {
       <Clock className="w-5 h-5 text-amber-800 shrink-0" />
       <p className="font-inter text-sm text-amber-800 leading-relaxed">
         We're still reviewing your registration details. This usually doesn't take long.
-        Feel free to look around; posting opportunities and reviewing applicants will
+        Feel free to look around; publishing activities and other features will
         unlock once you're verified.
       </p>
     </div>

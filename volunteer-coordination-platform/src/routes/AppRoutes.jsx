@@ -1,11 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../components/routing/ProtectedRoute";
-import PublicRoute from "../components/routing/PublicRoute";
 import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import SignUpPage from "../pages/SignUpPage";
 import ResetPassword from "../pages/ResetPassword";
-import VolunteerHomepage from "../pages/VolunteerHomepage";
 import AuthCallback from "../pages/AuthCallback";
 import OrganizerLayout from "../components/organizer/OrganizerLayout";
 import Dashboard from "../pages/organizer/Dashboard";
@@ -26,6 +24,7 @@ import VolunteerProfile from "../pages/volunteer/VolunteerProfile";
 import VolunteerProfileEdit from "../pages/volunteer/VolunteerProfileEdit";
 import Applicants from "../pages/organizer/Applicants";
 import Bookmarks from "../pages/volunteer/Bookmarks";
+import Achievements from "../pages/volunteer/Achievements";
 
 export default function AppRoutes() {
   return (
@@ -57,6 +56,7 @@ export default function AppRoutes() {
         <Route path="bookmarks" element={<Bookmarks />} />
         <Route path="profile" element={<VolunteerProfile />} />
         <Route path="profile/edit" element={<VolunteerProfileEdit />} />
+        <Route path="achievements" element={<Achievements />} />
       </Route>
 
       <Route

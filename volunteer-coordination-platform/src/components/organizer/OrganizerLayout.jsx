@@ -8,19 +8,20 @@ import {
   LayoutDashboard,
   Sparkles,
   UserPlus,
-  HeartHandshake,
+  Star,
 } from "lucide-react";
 
 const organizerNavItems = [
   { to: "/organizer/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/organizer/activities", label: "Activities", icon: Sparkles },
   { to: "/organizer/recruit", label: "Recruit", icon: UserPlus },
-  { to: "/organizer/reviews", label: "Reviews", icon: HeartHandshake },
+  { to: "/organizer/reviews", label: "Reviews", icon: Star },
 ];
 
 export default function OrganizerLayout() {
   const [organizerProfile, setOrganizerProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const navigate = useNavigate();
 
   const fetchProfile = async () => {
     const { data } = await getOrganizerProfile();

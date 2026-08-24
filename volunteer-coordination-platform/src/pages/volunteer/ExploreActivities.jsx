@@ -6,14 +6,12 @@ import FilterModal from "../../components/common/FilterModal";
 import { getPublicActivities } from "../../services/activities";
 import { getUserBookmarkIds, toggleBookmark } from "../../services/bookmarks";
 import { mapActivityToCard } from "../../utils/activities";
-import { useAuth } from "../../contexts/AuthContext";
 import { useToast } from "../../contexts/ToastContext";
 
 export default function ExploreActivities() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
-  const { user } = useAuth();
 
   const [activities, setActivities] = useState([]);
   const [bookmarkedIds, setBookmarkedIds] = useState(new Set());

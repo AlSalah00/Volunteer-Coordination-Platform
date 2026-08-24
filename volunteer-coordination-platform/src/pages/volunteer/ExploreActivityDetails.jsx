@@ -269,7 +269,7 @@ export default function ExploreActivityDetails() {
           disabled={hasApplied}
           className="w-full"
         >
-          {hasApplied ? "Application Submitted" : "Count Me In"}
+          {hasApplied ? "Request To Volunteer Sent" : "Count Me In"}
         </Button>
       </div>
 
