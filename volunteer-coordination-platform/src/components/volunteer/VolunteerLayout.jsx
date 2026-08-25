@@ -5,6 +5,7 @@ import { signOut } from "../../services/auth";
 import { useNavigate } from "react-router-dom";
 import { getVolunteerProfile } from "../../services/profile";
 import { Compass, Calendar, Bookmark, Award } from "lucide-react";
+import { useNotifications } from "../../contexts/NotificationContext";
 
 const volunteerNavItems = [
   { to: "/volunteer/explore", label: "Explore", icon: Compass },
@@ -16,6 +17,7 @@ const volunteerNavItems = [
 export default function VolunteerLayout() {
   const [volunteerProfile, setVolunteerProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const { unreadCount, openDrawer } = useNotifications();
   const navigate = useNavigate();
 
   const fetchProfile = async () => {
@@ -41,6 +43,8 @@ export default function VolunteerLayout() {
         avatarUrl={volunteerProfile?.avatar_url}
         profileSubtext="Volunteer Profile"
         profileLink="/volunteer/profile"
+        unreadNotificationCount={unreadCount}
+        onOpenNotifications={openDrawer}
         onLogout={async () => {
           await signOut();
           navigate("/");

@@ -2,14 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import Sidebar from "../common/Sidebar";
 import VerificationBanner from "./VerificationBanner";
+import { useNotifications } from "../../contexts/NotificationContext";
 import { signOut } from "../../services/auth";
 import { getOrganizerProfile } from "../../services/profile";
-import {
-  LayoutDashboard,
-  Sparkles,
-  UserPlus,
-  Star,
-} from "lucide-react";
+import { LayoutDashboard, Sparkles, UserPlus, Star } from "lucide-react";
 
 const organizerNavItems = [
   { to: "/organizer/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -21,6 +17,7 @@ const organizerNavItems = [
 export default function OrganizerLayout() {
   const [organizerProfile, setOrganizerProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const { unreadCount, openDrawer } = useNotifications();
   const navigate = useNavigate();
 
   const fetchProfile = async () => {
@@ -43,6 +40,8 @@ export default function OrganizerLayout() {
         avatarUrl={organizerProfile?.avatar_url}
         profileSubtext="Organizer Profile"
         profileLink="/organizer/profile"
+        unreadNotificationCount={unreadCount}
+        onOpenNotifications={openDrawer}
         onLogout={async () => {
           await signOut();
           navigate("/");

@@ -1,63 +1,116 @@
+import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { 
-  Heart, 
-  Sparkles, 
-  HandHeart, 
-  Users, 
-  ChevronLeft, 
+import {
+  Heart,
+  Sparkles,
+  HandHeart,
+  Users,
+  ChevronLeft,
   ChevronRight,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
 } from "lucide-react";
+import { getOrganizerDashboardMetrics, getOrganizerUpcomingActivities } from "../../services/dashboard";
+
+const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH_LABELS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+function startOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
 
 export default function Dashboard() {
   const { organizerProfile } = useOutletContext() || {};
 
-  // TODO: Replace with real aggregated real-time counts from Supabase tables
-  const metrics = [
+  const [metrics, setMetrics] = useState(null);
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(new Date()));
+
+  useEffect(() => {
+    let isMounted = true;
+
+    Promise.all([getOrganizerDashboardMetrics(), getOrganizerUpcomingActivities()]).then(
+      ([{ data: metricsData, error: metricsError }, { data: activitiesData, error: activitiesError }]) => {
+        if (!isMounted) return;
+
+        if (metricsError || activitiesError) {
+          setError("Couldn't load your dashboard. Try refreshing.");
+        } else {
+          setMetrics(metricsData);
+          setActivities(activitiesData);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const minMonth = startOfMonth(new Date());
+  const maxMonth = startOfMonth(new Date(minMonth.getFullYear(), minMonth.getMonth() + 3, 1));
+  const canGoPrev = visibleMonth.getTime() > minMonth.getTime();
+  const canGoNext = visibleMonth.getTime() < maxMonth.getTime();
+
+  const goToPrevMonth = () => {
+    if (!canGoPrev) return;
+    setVisibleMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const goToNextMonth = () => {
+    if (!canGoNext) return;
+    setVisibleMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
+  const year = visibleMonth.getFullYear();
+  const month = visibleMonth.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const leadingBlanks = new Date(year, month, 1).getDay();
+  const calendarDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  const activitiesByDay = activities.reduce((acc, activity) => {
+    const start = new Date(activity.starts_at);
+    if (start.getFullYear() !== year || start.getMonth() !== month) return acc;
+    const day = start.getDate();
+    (acc[day] ??= []).push(activity);
+    return acc;
+  }, {});
+
+  const metricCards = [
     {
       title: "Hours Gifted",
-      value: "1,240 hrs",
+      value: metrics ? `${Math.round(metrics.hours_gifted).toLocaleString()} hrs` : "-",
       subtext: "Scheduled time contributed",
       icon: Heart,
-      iconContainer: "bg-purple-50 border-purple-200/60 text-purple-600",
     },
     {
       title: "Activities Shared",
-      value: "18",
-      subtext: "Opportunities shared",
+      value: metrics ? metrics.activities_shared.toLocaleString() : "-",
+      subtext: "Volunteering opportunities",
       icon: Sparkles,
-      iconContainer: "bg-purple-50 border-purple-200/60 text-purple-600",
     },
     {
       title: "Acts of Kindness",
-      value: "84",
+      value: metrics ? metrics.acts_of_kindness.toLocaleString() : "-",
       subtext: "Community tasks completed",
       icon: HandHeart,
-      iconContainer: "bg-purple-50 border-purple-200/60 text-purple-600",
     },
     {
       title: "Helping Hands",
-      value: "312",
+      value: metrics ? metrics.helping_hands.toLocaleString() : "-",
       subtext: "Unique volunteers",
       icon: Users,
-      iconContainer: "bg-purple-50 border-purple-200/60 text-purple-600",
     },
   ];
-
-  // TODO: Replace with real dynamic query filtering for the current month from Supabase
-  const mockActivities = [
-    { id: 1, day: 8, title: "Park Cleanup", type: "environmental" },
-    { id: 2, day: 14, title: "Soup Kitchen Shift", type: "social" },
-    { id: 3, day: 22, title: "Senior Tech Workshop", type: "education" },
-    { id: 4, day: 22, title: "Food Drive Sorting", type: "social" },
-  ];
-
-  const calendarDays = Array.from({ length: 31 }, (_, i) => i + 1);
 
   return (
     <div className="min-h-screen w-full bg-purple-50">
       <div className="mx-auto max-w-7xl px-6 py-10 space-y-8">
-        
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -70,16 +123,22 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 1. Upper Row: Metric Cards */}
+        {error && (
+          <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
+            {error}
+          </div>
+        )}
+
+        {/* Upper Row Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-          {metrics.map((card, idx) => {
+          {metricCards.map((card, idx) => {
             const Icon = card.icon;
             return (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="flex items-center gap-4 rounded-2xl border border-purple-200/60 bg-white p-5 shadow-xs transition-all hover:-translate-y-0.5 hover:border-purple-300 hover:shadow-md"
               >
-                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${card.iconContainer}`}>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-purple-50 border-purple-200/60 text-purple-600">
                   <Icon className="h-6 w-6" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -87,47 +146,50 @@ export default function Dashboard() {
                     {card.title}
                   </p>
                   <h3 className="font-sora text-2xl font-extrabold text-purple-600 mt-0.5 tracking-tight truncate">
-                    {card.value}
+                    {loading ? "—" : card.value}
                   </h3>
-                  <p className="font-inter text-xs text-purple-600/60 truncate mt-0.5">
-                    {card.subtext}
-                  </p>
+                  <p className="font-inter text-xs text-purple-600/60 truncate mt-0.5">{card.subtext}</p>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* 2. Lower Row: Calendar View */}
+        {/* Lower Row Calendar View */}
         <div className="rounded-2xl border border-purple-200/60 bg-white p-6 shadow-xs">
-          
           {/* Calendar Header Control */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <div className="flex items-center gap-2">
                 <CalendarIcon className="h-5 w-5 text-purple-600" />
-                <h2 className="font-sora text-xl font-extrabold text-purple-600">
-                  Activity Schedule
-                </h2>
+                <h2 className="font-sora text-xl font-extrabold text-purple-600">Activity Schedule</h2>
               </div>
               <p className="font-inter text-xs text-purple-600/60 mt-0.5">
                 Keep track of your upcoming activities and volunteer blocks.
               </p>
             </div>
-            
+
             <div className="flex items-center gap-2 self-start sm:self-auto">
               <span className="font-sora text-sm font-bold text-purple-600 mr-2">
-                July 2026
+                {MONTH_LABELS[month]} {year}
               </span>
-              <button 
-                type="button" 
-                className="rounded-xl border border-purple-200/60 bg-purple-50/50 p-2 text-purple-600 hover:bg-purple-600 hover:text-white transition-colors cursor-pointer"
+              <button
+                type="button"
+                onClick={goToPrevMonth}
+                disabled={!canGoPrev}
+                className="rounded-xl border border-purple-200/60 bg-purple-50/50 p-2 text-purple-600 transition-colors
+                           hover:bg-purple-600 hover:text-white cursor-pointer disabled:cursor-not-allowed
+                           disabled:opacity-40 disabled:hover:bg-purple-50/50 disabled:hover:text-purple-600"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button 
-                type="button" 
-                className="rounded-xl border border-purple-200/60 bg-purple-50/50 p-2 text-purple-600 hover:bg-purple-600 hover:text-white transition-colors cursor-pointer"
+              <button
+                type="button"
+                onClick={goToNextMonth}
+                disabled={!canGoNext}
+                className="rounded-xl border border-purple-200/60 bg-purple-50/50 p-2 text-purple-600 transition-colors
+                           hover:bg-purple-600 hover:text-white cursor-pointer disabled:cursor-not-allowed
+                           disabled:opacity-40 disabled:hover:bg-purple-50/50 disabled:hover:text-purple-600"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -136,8 +198,11 @@ export default function Dashboard() {
 
           {/* Days of Week Header Grid */}
           <div className="grid grid-cols-7 gap-2 mb-2 text-center">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div key={day} className="font-sora text-xs font-bold uppercase tracking-wider text-purple-600/50 py-1">
+            {WEEKDAY_LABELS.map((day) => (
+              <div
+                key={day}
+                className="font-sora text-xs font-bold uppercase tracking-wider text-purple-600/50 py-1"
+              >
                 {day}
               </div>
             ))}
@@ -145,32 +210,29 @@ export default function Dashboard() {
 
           {/* Monthly Day Blocks Grid */}
           <div className="grid grid-cols-7 gap-2 auto-rows-[100px]">
-            {/* Offset cells for month alignment */}
-            <div className="rounded-xl border border-transparent bg-purple-50/20" />
-            <div className="rounded-xl border border-transparent bg-purple-50/20" />
-            <div className="rounded-xl border border-transparent bg-purple-50/20" />
-            
+            {Array.from({ length: leadingBlanks }, (_, i) => (
+              <div key={`blank-${i}`} className="rounded-xl border border-transparent bg-purple-50/20" />
+            ))}
+
             {calendarDays.map((day) => {
-              const dayActivities = mockActivities.filter(act => act.day === day);
+              const dayActivities = activitiesByDay[day] ?? [];
 
               return (
-                <div 
-                  key={day} 
-                  className="group flex flex-col justify-between rounded-xl border border-purple-100 bg-purple-50/30 p-2 transition-all hover:border-purple-300 hover:bg-white hover:shadow-xs cursor-pointer"
+                <div
+                  key={day}
+                  className="group flex flex-col justify-between rounded-xl border border-purple-100 bg-purple-50/30 p-2
+                             transition-all hover:border-purple-300 hover:bg-white hover:shadow-xs"
                 >
-                  <span className="font-sora text-xs font-extrabold text-purple-600/80">
-                    {day}
-                  </span>
-                  
-                  {/* Event indicators inside calendar block */}
+                  <span className="font-sora text-xs font-extrabold text-purple-600/80">{day}</span>
+
                   <div className="space-y-1 overflow-y-auto max-h-15 no-scrollbar">
                     {dayActivities.map((activity) => (
-                      <div 
+                      <div
                         key={activity.id}
                         className="truncate rounded-md bg-purple-600 px-1.5 py-0.5 font-sora text-[10px] font-bold text-white shadow-2xs"
-                        title={activity.title}
+                        title={activity.name}
                       >
-                        {activity.title}
+                        {activity.name}
                       </div>
                     ))}
                   </div>
@@ -179,7 +241,6 @@ export default function Dashboard() {
             })}
           </div>
         </div>
-
       </div>
     </div>
   );

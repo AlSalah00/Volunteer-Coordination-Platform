@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Avatar from "./Avatar";
-import { LogOut } from "lucide-react";
+import { LogOut, Bell } from "lucide-react";
 
 const textVariants = {
   hidden: { opacity: 0, x: -10, transition: { duration: 0.15 } },
@@ -15,6 +15,8 @@ export default function Sidebar({
   avatarUrl = null,
   profileSubtext = "Profile",
   profileLink = "/",
+  unreadNotificationCount = 0,
+  onOpenNotifications,
   onLogout,
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -24,6 +26,11 @@ export default function Sidebar({
   const handleLogout = () => {
     setMobileMenuOpen(false);
     if (onLogout) onLogout();
+  };
+
+  const handleOpenNotifications = () => {
+    setMobileMenuOpen(false);
+    if (onOpenNotifications) onOpenNotifications();
   };
 
   return (
@@ -122,6 +129,27 @@ export default function Sidebar({
                         <span>{label}</span>
                       </NavLink>
                     ))}
+
+                    {/* Mobile Notifications Button */}
+                    <button
+                      type="button"
+                      onClick={handleOpenNotifications}
+                      className="flex items-center justify-between px-3 py-2.5 rounded-xl font-sora text-sm font-bold text-purple-50/80 hover:bg-purple-50/10 hover:text-purple-50 transition-all text-left cursor-pointer focus:outline-none"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="relative shrink-0">
+                          <Bell className="w-5 h-5" />
+                          {unreadNotificationCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-white text-purple-600 text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                              {unreadNotificationCount > 99
+                                ? "99+"
+                                : unreadNotificationCount}
+                            </span>
+                          )}
+                        </div>
+                        <span>Notifications</span>
+                      </div>
+                    </button>
                   </div>
 
                   <div className="h-px bg-purple-500/30 my-0.5" />
@@ -238,6 +266,37 @@ export default function Sidebar({
               </AnimatePresence>
             </NavLink>
           ))}
+
+          {/* Desktop Notifications Button */}
+          <button
+            type="button"
+            onClick={handleOpenNotifications}
+            className="w-full flex items-center gap-4 px-3.5 py-3 rounded-xl font-sora text-sm font-bold transition-all duration-200 text-purple-50/80 hover:bg-purple-50/10 hover:text-purple-50 text-left cursor-pointer focus:outline-none"
+          >
+            <div className="relative shrink-0">
+              <Bell className="w-5 h-5" />
+              {unreadNotificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-purple-600 text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                  {unreadNotificationCount > 99
+                    ? "99+"
+                    : unreadNotificationCount}
+                </span>
+              )}
+            </div>
+            <AnimatePresence mode="wait">
+              {isExpanded && (
+                <motion.span
+                  variants={textVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  className="whitespace-nowrap"
+                >
+                  Notifications
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
         </nav>
 
         <div className="mt-auto pt-4">
