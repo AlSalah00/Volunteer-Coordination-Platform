@@ -67,7 +67,6 @@ export default function Applicants() {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // { type: "accept" | "reject" | "revoke" | "reconsider", applicant } or null
   const [confirmAction, setConfirmAction] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
 

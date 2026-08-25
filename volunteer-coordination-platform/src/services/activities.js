@@ -27,6 +27,23 @@ export async function getOrganizerActivities() {
     .order("starts_at", { ascending: true });
 }
 
+export async function getUpcomingOrganizerActivities() {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: [], error: userError ?? new Error("Not signed in.") };
+  }
+
+  const { data, error } = await supabase
+    .from("activities")
+    .select("*, activity_tasks(*)")
+    .eq("organizer_id", user.id)
+    .eq("status", "upcoming")
+    .order("starts_at", { ascending: true });
+
+  return { data: data ?? [], error };
+}
+
 export async function getPublicActivities() {
   return supabase
     .from("activities")

@@ -240,6 +240,48 @@ export async function getVolunteerProfileById(volunteerId) {
   };
 }
 
+export async function getAllVolunteers() {
+  const { data, error } = await supabase
+    .from("volunteer_profiles")
+    .select(`
+      profile_id,
+      first_name, 
+      last_name, 
+      skills, 
+      interests, 
+      availability, 
+      xp, 
+      location, 
+      profiles (avatar_url, bio, contact_number, email)
+    `)
+    .order("xp", { ascending: false });
+
+  if (error || !data) return { data: [], error };
+
+  const formattedData = data.map((vol) => {
+    const levelInfo = getLevelInfo(vol.xp ?? 0);
+    const firstName = vol.first_name ?? "";
+    const lastName = vol.last_name ?? "";
+
+    return {
+      profile_id: vol.profile_id,
+      fullName: `${firstName} ${lastName}`.trim() || "Volunteer",
+      volunteerAvatarUrl: vol.profiles?.avatar_url ?? null,
+      email: vol.profiles?.email ?? null,
+      contact_number: vol.profiles?.contact_number ?? null,
+      bio: vol.profiles?.bio ?? null,
+      location: vol.location ?? null,
+      skills: vol.skills ?? [],
+      interests: vol.interests ?? [],
+      availability: vol.availability ?? {},
+      xp: vol.xp ?? 0,
+      ...levelInfo,
+    };
+  });
+
+  return { data: formattedData, error: null };
+}
+
 export function isVolunteerProfileComplete(profile) {
   if (!profile) return false;
  

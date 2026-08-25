@@ -5,10 +5,17 @@ import SelectField from "../common/SelectField";
 import Button from "../common/Button";
 
 const LEVEL_OPTIONS = [
-  { value: "any", label: "Any level" },
-  { value: "beginner", label: "Beginner" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "advanced", label: "Advanced" },
+  { value: "any", label: "Any" },
+  { value: "Newcomer", label: "Newcomer" },
+  { value: "Newcomer", label: "Helper" },
+  { value: "Kind Soul", label: "Kind Soul" },
+  { value: "Dedicated Supporter", label: "Dedicated Supporter" },
+  { value: "Active Hand", label: "Active Hand" },
+  { value: "ChangeMaker", label: "ChangeMaker" },
+  { value: "Inspirer", label: "Inspirer" },
+  { value: "Community Builder", label: "Community Builder" },
+  { value: "Community Hero", label: "Community Hero" },
+  { value: "Beacon", label: "Beacon" },
 ];
 
 const REWARD_OPTIONS = [
@@ -39,7 +46,7 @@ export default function TaskCard({ index, task, onChange, onRemove }) {
       <FormField
         id={`task-name-${task.id}`}
         label="Task name"
-        placeholder="e.g. Registration desk"
+        placeholder="example: Registration desk"
         value={task.name}
         onChange={(e) => update("name", e.target.value)}
         required
