@@ -58,7 +58,7 @@ export default function CustomSelect({
         onClick={() => setOpen((prev) => !prev)}
         className={triggerClassName ?? defaultTriggerClass}
       >
-        <span className="truncate">
+        <span className={`truncate ${!selectedOption ? "text-purple-600/40" : ""}`}>
           {selectedOption
             ? renderOption
               ? renderOption(selectedOption)

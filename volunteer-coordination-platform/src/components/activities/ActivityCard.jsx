@@ -214,7 +214,7 @@ export default function ActivityCard({
               />
               <ActionIcon
                 icon={UserCheck}
-                label="Volunteers Waiting"
+                label="Volunteering Requests"
                 onClick={onViewApplicants}
               />
             </div>

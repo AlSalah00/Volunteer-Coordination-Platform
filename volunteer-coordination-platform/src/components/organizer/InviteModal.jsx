@@ -8,7 +8,6 @@ import { sendInvitation } from "../../services/invitations";
 import { hasRequiredTitle } from "../../utils/leveling";
 import Button from "../../components/common/Button";
 import TextAreaField from "../../components/common/TextAreaField";
-import SelectField from "../common/SelectField";
 
 export default function InviteModal({ isOpen, onClose, volunteer, onSuccess }) {
   const [activities, setActivities] = useState([]);
@@ -79,7 +78,7 @@ export default function InviteModal({ isOpen, onClose, volunteer, onSuccess }) {
 
   const activityOptions = activities.map((act) => ({
     value: act.id,
-    label: act.title,
+    label: act.name || "Untitled Activity",
   }));
 
   return (
@@ -143,7 +142,7 @@ export default function InviteModal({ isOpen, onClose, volunteer, onSuccess }) {
                 No upcoming activities found. Please create an activity first.
               </div>
             ) : (
-              <SelectField
+              <CustomSelect
                 value={selectedActivityId}
                 onChange={handleActivityChange}
                 options={activityOptions}

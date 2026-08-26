@@ -145,7 +145,7 @@ export default function Applicants() {
       </button>
 
       <h1 className="mb-6 font-sora text-3xl font-extrabold text-purple-600">
-        Volunteers Waiting{activityName ? ` - ${activityName}` : ""}
+        Volunteering Requests{activityName ? ` - ${activityName}` : ""}
       </h1>
 
       {!loading && !error && applicants.length > 0 && (

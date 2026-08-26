@@ -1,23 +1,58 @@
-// src/components/common/NotificationsDrawer.jsx
 import { useState, useEffect } from "react";
 import Drawer from "./Drawer";
-import { Bell, CheckCheck, ArrowLeft, Clock } from "lucide-react";
+import {
+  Bell,
+  CheckCheck,
+  ArrowLeft,
+  Clock,
+  Check,
+  X,
+  Loader2,
+} from "lucide-react";
 import { useNotifications } from "../../contexts/NotificationContext";
 import { formatDateTime } from "../../utils/activities";
+import {
+  respondToInvitation,
+  getInvitationById,
+} from "../../services/invitations";
+import Button from "./Button";
 
 export default function NotificationsDrawer() {
   const { notifications, isDrawerOpen, closeDrawer, markAsRead, markAllRead } =
     useNotifications();
 
-  // Local state for detail view
   const [selectedNotification, setSelectedNotification] = useState(null);
 
-  // Reset detail view when drawer closes
+  const [invitationStatus, setInvitationStatus] = useState(null);
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  const [isResponding, setIsResponding] = useState(false);
+
   useEffect(() => {
     if (!isDrawerOpen) {
       setSelectedNotification(null);
+      setInvitationStatus(null);
     }
   }, [isDrawerOpen]);
+
+  // Fetch invitation status when an activity invitation is selected
+  useEffect(() => {
+    if (
+      selectedNotification?.type === "activity_invitation" &&
+      selectedNotification?.data?.invitation_id
+    ) {
+      setLoadingStatus(true);
+      getInvitationById(selectedNotification.data.invitation_id).then(
+        ({ data, error }) => {
+          setLoadingStatus(false);
+          if (!error && data) {
+            setInvitationStatus(data.status);
+          }
+        },
+      );
+    } else {
+      setInvitationStatus(null);
+    }
+  }, [selectedNotification]);
 
   const handleSelectNotification = (notification) => {
     setSelectedNotification(notification);
@@ -26,14 +61,58 @@ export default function NotificationsDrawer() {
     }
   };
 
-  const getNotificationType = (type) => {
-    switch (type) {
+  const handleRespond = async (response) => {
+    const invitationId = selectedNotification?.data?.invitation_id;
+    if (!invitationId) return;
+
+    setIsResponding(true);
+    const { error } = await respondToInvitation(invitationId, response);
+    setIsResponding(false);
+
+    if (!error) {
+      setInvitationStatus(response);
+    }
+  };
+
+  const getNotificationType = (notification) => {
+    if (!notification) return "Benevolentia";
+
+    switch (notification.type) {
+      case "activity_invitation":
+        return notification.data?.organizer_name || "Unknown";
       case "system_alert":
-        return "Benevolentia";
       default:
         return "Benevolentia";
     }
   };
+
+  // Helper to filter out ID fields from the jsonb payload
+  const getDetailEntries = (data) => {
+    if (!data) return [];
+    return Object.entries(data).filter(
+      ([key]) =>
+        key !== "note" &&
+        key.toLowerCase() !== "id" &&
+        !key.toLowerCase().endsWith("_id") &&
+        !key.toLowerCase().endsWith("id"),
+    );
+  };
+
+  const formatDetailValue = (key, val) => {
+  if (val === null || val === undefined) return "";
+
+  const isDateKey = /date|time|_at$/i.test(key);
+  const isIsoDateString = typeof val === "string" && /^\d{4}-\d{2}-\d{2}/.test(val);
+
+  if ((isDateKey || isIsoDateString) && !isNaN(Date.parse(val))) {
+    const formatted = formatDateTime(val);
+    if (formatted && formatted !== "Invalid Date") {
+      return formatted;
+    }
+  }
+
+  return String(val);
+};
 
   return (
     <Drawer
@@ -72,37 +151,96 @@ export default function NotificationsDrawer() {
           <div className="font-inter text-xs font-semibold text-purple-600/70">
             From:{" "}
             <span className="font-bold text-purple-600">
-              {getNotificationType(selectedNotification.type)}
+              {getNotificationType(selectedNotification)}
             </span>
           </div>
 
-          <div className="rounded-2xl border border-purple-100 bg-purple-50 p-5 font-inter text-sm leading-relaxed text-purple-600/80">
-            {selectedNotification.body}
-          </div>
+          {/* Unified Purple Message Card */}
+          <div className="space-y-4 rounded-2xl border border-purple-100 bg-purple-50 p-5 font-inter text-sm leading-relaxed text-purple-600/80">
+            {/* Body */}
+            <div>{selectedNotification.body}</div>
 
-          {selectedNotification.data &&
-            Object.keys(selectedNotification.data).length > 0 && (
-              <div className="space-y-2 rounded-2xl border border-purple-200/60 bg-white p-4">
-                <p className="font-sora text-xs font-bold uppercase tracking-wider text-purple-600/50">
-                  Additional Details
+            {/* Note (if present in JSONB) */}
+            {selectedNotification.data?.note && (
+              <div className="rounded-xl border border-purple-200/60 bg-white/70 p-3 shadow-2xs">
+                <span className="mb-1 block font-sora text-[10px] font-bold uppercase tracking-wider text-purple-600/60">
+                  Note
+                </span>
+                <p className="font-inter text-xs font-medium text-purple-600/80">
+                  {selectedNotification.data.note}
                 </p>
-                <div className="space-y-1 font-inter text-xs text-purple-600">
-                  {Object.entries(selectedNotification.data).map(
-                    ([key, val]) => (
-                      <div
-                        key={key}
-                        className="flex justify-between py-1 border-b border-purple-50 last:border-none"
-                      >
-                        <span className="capitalize text-purple-600/60">
-                          {key.replace(/_/g, " ")}:
-                        </span>
-                        <span className="font-bold">{String(val)}</span>
-                      </div>
-                    ),
-                  )}
-                </div>
               </div>
             )}
+
+            {/* Non-ID Key-Value Details */}
+            {(() => {
+              const details = getDetailEntries(selectedNotification.data);
+              if (details.length === 0) return null;
+
+              return (
+                <div className="space-y-1.5 border-t border-purple-200/60 pt-3 font-inter text-xs">
+                  {details.map(([key, val]) => (
+                    <div
+                      key={key}
+                      className="flex justify-between py-0.5 text-purple-600"
+                    >
+                      <span className="capitalize text-purple-600/60">
+                        {key.replace(/_/g, " ")}:
+                      </span>
+                      <span className="font-bold">{formatDetailValue(key, val)}</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Invitation Action Controls */}
+          {selectedNotification.type === "activity_invitation" && (
+            <div className="space-y-3 rounded-2xl border border-purple-200/60 bg-white p-4">
+              <p className="font-sora text-xs font-bold uppercase tracking-wider text-purple-600/60">
+                Invitation Action
+              </p>
+
+              {loadingStatus ? (
+                <div className="flex items-center gap-2 font-inter text-xs text-purple-600/50 py-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
+                  Checking status...
+                </div>
+              ) : invitationStatus === "pending" ? (
+                <div className="flex items-center gap-3 pt-1">
+                  <Button
+                    onClick={() => handleRespond("accepted")}
+                    disabled={isResponding}
+                    variant="primary"
+                    className="flex-1 justify-center"
+                  >
+                    <Check className="h-4 w-4" />
+                    {isResponding ? "Processing..." : "Accept"}
+                  </Button>
+                  <Button
+                    onClick={() => handleRespond("declined")}
+                    disabled={isResponding}
+                    variant="danger"
+                    className="flex-1 justify-center"
+                  >
+                    <X className="h-4 w-4" />
+                    Decline
+                  </Button>
+                </div>
+              ) : invitationStatus === "accepted" ? (
+                <div className="flex items-center gap-2 rounded-xl bg-teal-50 border border-teal-200 p-3 font-inter text-xs font-bold text-teal-700">
+                  <Check className="h-4 w-4" />
+                  You accepted this invitation.
+                </div>
+              ) : invitationStatus === "declined" ? (
+                <div className="flex items-center gap-2 rounded-xl bg-amber-50 border border-coral-200 p-3 font-inter text-xs font-bold text-amber-600">
+                  <X className="h-4 w-4" />
+                  You declined this invitation.
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
       ) : (
         /* List View */
