@@ -44,9 +44,11 @@ export default function OrgProfileEdit() {
 
   if (loadingProfile) {
     return (
-      <p className="font-inter text-sm text-purple-600/60">
-        Loading profile...
-      </p>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <p className="font-inter text-sm text-purple-600/60">
+          Loading profile...
+        </p>
+      </div>
     );
   }
 
@@ -80,77 +82,79 @@ export default function OrgProfileEdit() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="font-sora text-3xl font-extrabold text-purple-600">
-          Edit Profile
-        </h1>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => navigate(-1)}
-            variant="cancel"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      </div>
-
-      {error && (
-        <div className="mb-6 rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
-          {error}
-        </div>
-      )}
-
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <div className="mb-6 flex justify-center">
-          <AvatarUploadField
-            initialImageUrl={form.existingAvatarUrl}
-            name={form.orgName}
-            onChange={(file) => updateField("avatar", file)}
-          />
+    <div className="mx-auto max-w-4xl px-4 sm:px-6">
+      <form onSubmit={handleSubmit} className="w-full">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className="font-sora text-2xl sm:text-3xl font-extrabold text-purple-600">
+            Edit Profile
+          </h1>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => navigate(-1)}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-6">
-          <FormField
-            id="orgName"
-            label="Organization name"
-            value={form.orgName}
-            onChange={(e) => updateField("orgName", e.target.value)}
-            required
-          />
+        {error && (
+          <div className="mb-6 rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
+            {error}
+          </div>
+        )}
 
-          <TextAreaField
-            id="bio"
-            label="Bio"
-            placeholder="Tell volunteers a bit about your organization..."
-            value={form.bio}
-            onChange={(e) => updateField("bio", e.target.value)}
-            rows={4}
-          />
+        <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="mb-6 flex justify-center">
+            <AvatarUploadField
+              initialImageUrl={form.existingAvatarUrl}
+              name={form.orgName}
+              onChange={(file) => updateField("avatar", file)}
+            />
+          </div>
 
-          <FormField
-            id="address"
-            label="Address"
-            value={form.address}
-            onChange={(e) => updateField("address", e.target.value)}
-          />
+          <div className="flex flex-col gap-6">
+            <FormField
+              id="orgName"
+              label="Organization name"
+              value={form.orgName}
+              onChange={(e) => updateField("orgName", e.target.value)}
+              required
+            />
 
-          <FormField
-            id="contactNumber"
-            label="Contact number"
-            type="tel"
-            placeholder="e.g. +60 12-345 6789"
-            value={form.contactNumber}
-            onChange={(e) => updateField("contactNumber", e.target.value)}
-          />
-        </div>
-      </section>
-    </form>
+            <TextAreaField
+              id="bio"
+              label="Bio"
+              placeholder="Tell volunteers a bit about your organization..."
+              value={form.bio}
+              onChange={(e) => updateField("bio", e.target.value)}
+              rows={4}
+            />
+
+            <FormField
+              id="address"
+              label="Address"
+              value={form.address}
+              onChange={(e) => updateField("address", e.target.value)}
+            />
+
+            <FormField
+              id="contactNumber"
+              label="Contact number"
+              type="tel"
+              placeholder="e.g. +60 12-345 6789"
+              value={form.contactNumber}
+              onChange={(e) => updateField("contactNumber", e.target.value)}
+            />
+          </div>
+        </section>
+      </form>
+    </div>
   );
 }

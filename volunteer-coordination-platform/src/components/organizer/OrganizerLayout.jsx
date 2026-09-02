@@ -33,7 +33,7 @@ export default function OrganizerLayout() {
   const isVerified = organizerProfile?.verification_status === "verified";
 
   return (
-    <div className="min-h-screen w-full bg-purple-50 flex">
+    <div className="min-h-screen w-full bg-purple-50 flex flex-col md:flex-row">
       <Sidebar
         navItems={organizerNavItems}
         profileName={organizerProfile?.org_name || "Unknown Organizer"}
@@ -48,16 +48,22 @@ export default function OrganizerLayout() {
         }}
       />
 
-      <div className="flex-1 flex pt-20 flex-col min-w-0">
-        {!loadingProfile && !isVerified && <VerificationBanner />}
+      <div className="flex-1 flex flex-col min-w-0 pt-16 md:pt-0">
+        {/* Banner wrapper aligned with main content margins */}
+        {!loadingProfile && !isVerified && (
+          <div className="px-4 sm:px-6 lg:px-10 pt-4 sm:pt-6 lg:pt-8">
+            <VerificationBanner />
+          </div>
+        )}
 
-        <main className="flex-1 p-6 lg:p-10">
+        {/* Adjust top padding when banner exists using standard document flow */}
+        <main className={`flex-1 p-4 sm:p-6 lg:p-10 ${!isVerified && !loadingProfile ? "pt-4 sm:pt-6" : ""}`}>
           <Outlet
             context={{
               organizerProfile,
               isVerified,
               loadingProfile,
-              refetchProfile: fetchProfile, // Allows child pages to update layout state
+              refetchProfile: fetchProfile,
             }}
           />
         </main>

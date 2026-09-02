@@ -8,7 +8,6 @@ import {
   UserCheck,
   Bookmark,
 } from "lucide-react";
-import StatusBadge from "./StatusBadge";
 import Button from "../common/Button";
 import { formatDateTime } from "../../utils/activities";
 import defaultActivityImage from "../../assets/defaultActivityImage.svg";
@@ -30,7 +29,7 @@ function ActionIcon({ icon: Icon, label, onClick }) {
       <span
         className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md
                    bg-purple-800 px-2.5 py-1 font-inter text-[11px] text-purple-50 opacity-0
-                   transition-opacity group-hover:opacity-100"
+                   transition-opacity group-hover:opacity-100 z-10"
       >
         {label}
       </span>
@@ -79,10 +78,10 @@ export default function ActivityCard({
           onClick?.(e);
         }
       }}
-      className="group/card flex overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+      className="group/card flex flex-col sm:flex-row overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
     >
       {/* Image Thumbnail */}
-      <div className="relative w-36 shrink-0 sm:w-44">
+      <div className="relative h-44 w-full shrink-0 sm:h-auto sm:w-44">
         <img
           src={image || defaultActivityImage}
           alt=""
@@ -164,7 +163,7 @@ export default function ActivityCard({
           {/* Volunteer Spots & Progress Bar */}
           <div>
             <div className="mb-1 flex items-center gap-1.5 font-inter text-xs text-purple-600/70">
-              <Users className="h-3.5 w-3.5" />
+              <Users className="h-3.5 w-3.5 shrink-0" />
               <span>
                 {hasFilledCount
                   ? `${volunteersFilled}/${volunteersCapacity} joined`
@@ -205,7 +204,7 @@ export default function ActivityCard({
           <>
             <div className="my-4 border-t border-purple-100" />
 
-            <div className="mt-auto flex items-center gap-2 pt-1">
+            <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
               <ActionIcon icon={Pencil} label="Edit" onClick={onEdit} />
               <ActionIcon
                 icon={ClipboardCheck}

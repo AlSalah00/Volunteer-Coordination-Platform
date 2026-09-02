@@ -34,7 +34,7 @@ export default function AchievementStats({
           )}
 
           <div className="mt-1.5">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-0.5 border border-amber-200/60 font-sora text-xs font-bold text-amber-700">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-0.5 border border-purple-200/60 font-sora text-xs font-bold text-purple-600">
               {title}
             </span>
           </div>

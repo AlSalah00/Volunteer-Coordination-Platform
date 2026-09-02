@@ -48,9 +48,11 @@ export default function OrgProfile() {
 
   if (loadingProfile) {
     return (
-      <p className="font-inter text-sm text-purple-600/60">
-        Loading profile...
-      </p>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <p className="font-inter text-sm text-purple-600/60">
+          Loading profile...
+        </p>
+      </div>
     );
   }
 
@@ -98,20 +100,21 @@ export default function OrgProfile() {
 
   if (error || !organizerProfile) {
     return (
-      <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
-        {error || "Oh no! We couldn't find your profile."}
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
+          {error || "Oh no! We couldn't find your profile."}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="mx-auto max-w-4xl px-4 sm:px-6">
       {/* Banner + avatar + actions */}
-      <div className="relative mb-6 overflow-hidden rounded-2xl border border-purple-200/60 bg-white">
-        <div className="relative h-36 overflow-hidden bg-purple-600">
-        </div>
+      <div className="relative mb-6 overflow-hidden rounded-2xl border border-purple-200/60 bg-white shadow-xs">
+        <div className="relative h-36 overflow-hidden bg-purple-600"></div>
 
-        <div className="absolute left-8 top-24">
+        <div className="absolute left-6 sm:left-8 top-20 sm:top-24">
           <Avatar
             src={organizerProfile?.avatar_url}
             name={organizerProfile?.org_name}
@@ -120,9 +123,9 @@ export default function OrgProfile() {
           />
         </div>
 
-        <div className="px-8 pb-6 pt-4 sm:pl-40">
+        <div className="px-6 pb-6 pt-16 sm:px-8 sm:pb-6 sm:pt-4 sm:pl-44">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="font-sora text-2xl font-extrabold text-purple-600">
+            <h1 className="font-sora text-2xl sm:text-3xl font-extrabold text-purple-600">
               {organizerProfile?.org_name}
             </h1>
             {isVerified && (
@@ -149,7 +152,7 @@ export default function OrgProfile() {
             )}
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-col sm:flex-row flex-wrap gap-3">
             <Button
               onClick={() => navigate("/organizer/profile/edit")}
             >
@@ -179,7 +182,7 @@ export default function OrgProfile() {
 
       {/* Bio */}
       {organizerProfile?.bio && (
-        <section className="mb-6 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
+        <section className="mb-6 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
           <h2 className="mb-3 font-sora text-lg font-extrabold text-purple-600">
             About Organization
           </h2>
@@ -190,7 +193,7 @@ export default function OrgProfile() {
       )}
 
       {/* Contact info */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
         <h2 className="mb-5 font-sora text-lg font-extrabold text-purple-600">
           Contact & Info
         </h2>

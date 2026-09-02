@@ -126,7 +126,7 @@ export default function Signup() {
                 <FormField
                   id="firstName"
                   label="First name"
-                  placeholder="Aisyah"
+                  placeholder="Mohamed"
                   autoComplete="given-name"
                   required
                 />
@@ -160,7 +160,7 @@ export default function Signup() {
               <FormField
                 id="orgName"
                 label="Organization name"
-                placeholder="Komuniti Peduli"
+                placeholder="Development for All"
                 autoComplete="organization"
                 required
               />

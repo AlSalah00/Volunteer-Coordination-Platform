@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "./Modal";
 
 // Static placeholder list
@@ -17,9 +17,21 @@ const TYPE_OPTIONS = [
   { value: "online", label: "Online" },
 ];
 
-export default function FilterModal({ isOpen, onClose }) {
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [activityType, setActivityType] = useState("any");
+export default function FilterModal({ isOpen, onClose, initialFilters, onApply }) {
+  const [selectedCategories, setSelectedCategories] = useState(
+    initialFilters?.selectedCategories || []
+  );
+  const [activityType, setActivityType] = useState(
+    initialFilters?.activityType || "any"
+  );
+
+  // Sync internal state with props whenever modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCategories(initialFilters?.selectedCategories || []);
+      setActivityType(initialFilters?.activityType || "any");
+    }
+  }, [isOpen, initialFilters]);
 
   const toggleCategory = (category) => {
     setSelectedCategories((prev) =>
@@ -30,6 +42,14 @@ export default function FilterModal({ isOpen, onClose }) {
   const handleClear = () => {
     setSelectedCategories([]);
     setActivityType("any");
+  };
+
+  const handleApply = () => {
+    onApply({
+      selectedCategories,
+      activityType,
+    });
+    onClose();
   };
 
   return (
@@ -97,7 +117,7 @@ export default function FilterModal({ isOpen, onClose }) {
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleApply}
             className="cursor-pointer rounded-md bg-purple-600 px-5 py-2.5 font-sora text-sm font-bold text-purple-50
                        transition-all duration-200 hover:bg-purple-800 active:scale-95"
           >

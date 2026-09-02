@@ -36,7 +36,7 @@ export default function VolunteerLayout() {
       .join(" ") || "Unknown Volunteer";
 
   return (
-    <div className="min-h-screen w-full bg-purple-50 flex">
+    <div className="min-h-screen w-full bg-purple-50 flex flex-col md:flex-row">
       <Sidebar
         navItems={volunteerNavItems}
         profileName={fullName}
@@ -52,7 +52,7 @@ export default function VolunteerLayout() {
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <main className="flex-1 p-6 lg:p-10">
+        <main className="flex-1 p-4 sm:p-6 lg:p-10"> 
           <Outlet
             context={{
               volunteerProfile,

@@ -45,7 +45,7 @@ const MODAL_COPY = {
 
 function StatBlock({ label, value }) {
   return (
-    <div className="rounded-xl border border-purple-200/60 bg-white p-4 text-center">
+    <div className="rounded-xl border border-purple-200/60 bg-white p-4 text-center shadow-xs">
       <p className="font-sora text-2xl font-extrabold text-purple-600">
         {value}
       </p>
@@ -135,7 +135,7 @@ export default function Applicants() {
   };
 
   return (
-    <div className="max-w-3xl">
+    <div className="mx-auto max-w-4xl px-4 sm:px-6">
       <button
         type="button"
         onClick={() => navigate(-1)}
@@ -144,7 +144,7 @@ export default function Applicants() {
         ← Back
       </button>
 
-      <h1 className="mb-6 font-sora text-3xl font-extrabold text-purple-600">
+      <h1 className="mb-6 font-sora text-2xl sm:text-3xl font-extrabold text-purple-600">
         Volunteering Requests{activityName ? ` - ${activityName}` : ""}
       </h1>
 

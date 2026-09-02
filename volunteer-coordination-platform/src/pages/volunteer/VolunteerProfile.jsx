@@ -83,9 +83,11 @@ export default function VolunteerProfile() {
 
   if (loadingProfile) {
     return (
-      <p className="font-inter text-sm text-purple-600/60">
-        Loading profile...
-      </p>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <p className="font-inter text-sm text-purple-600/60">
+          Loading profile...
+        </p>
+      </div>
     );
   }
 
@@ -135,8 +137,10 @@ export default function VolunteerProfile() {
 
   if (error || !volunteerProfile) {
     return (
-      <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
-        {error || "Oh no! We couldn't find your profile."}
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
+          {error || "Oh no! We couldn't find your profile."}
+        </div>
       </div>
     );
   }
@@ -198,13 +202,12 @@ export default function VolunteerProfile() {
   };
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 space-y-6">
       {/* Banner + Avatar + Header Info */}
-      <div className="relative overflow-hidden rounded-2xl border border-purple-200/60 bg-white">
-        <div className="relative h-36 overflow-hidden bg-purple-600">
-        </div>
+      <div className="relative overflow-hidden rounded-2xl border border-purple-200/60 bg-white shadow-xs">
+        <div className="relative h-36 overflow-hidden bg-purple-600"></div>
 
-        <div className="absolute left-8 top-24">
+        <div className="absolute left-6 sm:left-8 top-20 sm:top-24">
           <Avatar
             src={volunteerProfile?.avatar_url}
             name={fullName}
@@ -213,21 +216,21 @@ export default function VolunteerProfile() {
           />
         </div>
 
-        <div className="px-8 pb-6 pt-4 sm:pl-40">
+        <div className="px-6 pb-6 pt-16 sm:px-8 sm:pb-6 sm:pt-4 sm:pl-44">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-sora text-2xl font-extrabold text-purple-600">
+            <h1 className="font-sora text-2xl sm:text-3xl font-extrabold text-purple-600">
               {fullName}
             </h1>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 border border-amber-200/60">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span className="font-sora text-xs font-bold text-amber-700">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-1 border border-purple-200/60">
+              <Sparkles className="h-3.5 w-3.5 text-purple-600" />
+              <span className="font-sora text-xs font-bold text-purple-600">
                 Level {volunteerProfile.level} – {volunteerProfile.title}
               </span>
             </div>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-col sm:flex-row flex-wrap gap-3">
             <Button
               onClick={() => navigate("/volunteer/profile/edit")}
             >
@@ -257,7 +260,7 @@ export default function VolunteerProfile() {
 
       {/* Bio / About */}
       {volunteerProfile?.bio && (
-        <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
+        <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
           <h2 className="mb-3 font-sora text-lg font-extrabold text-purple-600">
             About Me
           </h2>
@@ -268,7 +271,7 @@ export default function VolunteerProfile() {
       )}
 
       {/* Skills */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
         <div className="flex items-center gap-2 mb-4">
           <Wrench className="h-5 w-5 text-purple-600" />
           <h2 className="font-sora text-lg font-extrabold text-purple-600">
@@ -289,7 +292,7 @@ export default function VolunteerProfile() {
       </section>
 
       {/* Interests */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
         <div className="flex items-center gap-2 mb-4">
           <Heart className="h-5 w-5 text-purple-600" />
           <h2 className="font-sora text-lg font-extrabold text-purple-600">
@@ -310,7 +313,7 @@ export default function VolunteerProfile() {
       </section>
 
       {/* Availability */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
         <div className="flex items-center gap-2 mb-4">
           <Calendar className="h-5 w-5 text-purple-600" />
           <h2 className="font-sora text-lg font-extrabold text-purple-600">
@@ -321,7 +324,7 @@ export default function VolunteerProfile() {
       </section>
 
       {/* Contact Info */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
+      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
         <h2 className="mb-5 font-sora text-lg font-extrabold text-purple-600">
           Contact Info
         </h2>

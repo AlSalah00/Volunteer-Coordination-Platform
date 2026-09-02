@@ -174,215 +174,219 @@ export default function ActivityForm() {
 
   if (isLoading) {
     return (
-      <p className="font-inter text-sm text-purple-600/60">
-        Loading activity...
-      </p>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <p className="font-inter text-sm text-purple-600/60">
+          Loading activity...
+        </p>
+      </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="font-sora text-3xl font-extrabold text-purple-600">
-          {isEditMode ? "Edit Activity" : "New Activity"}
-        </h1>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => navigate(-1)}
-            variant="cancel"
-          >
-            Cancel
-          </Button>
-
-          {isEditMode && (
+    <div className="mx-auto max-w-4xl px-4 sm:px-6">
+      <form onSubmit={handleSubmit} className="w-full">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className="font-sora text-2xl sm:text-3xl font-extrabold text-purple-600">
+            {isEditMode ? "Edit Activity" : "New Activity"}
+          </h1>
+          <div className="flex flex-wrap items-center gap-3">
             <Button
-              onClick={() => setShowDeleteModal(true)}
-              disabled={isDeleting}
-              variant="danger"
+              onClick={() => navigate(-1)}
+              variant="outline"
             >
-              {isDeleting ? "Deleting..." : "Delete Activity"}
+              Cancel
             </Button>
-          )}
 
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting
-              ? isEditMode
-                ? "Updating..."
-                : "Publishing..."
-              : isEditMode
-                ? "Update Activity"
-                : "Publish Activity"}
-          </Button>
-        </div>
-      </div>
+            {isEditMode && (
+              <Button
+                onClick={() => setShowDeleteModal(true)}
+                disabled={isDeleting}
+                variant="danger"
+              >
+                {isDeleting ? "Deleting..." : "Delete Activity"}
+              </Button>
+            )}
 
-      {error && (
-        <div className="mb-6 rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
-          {error}
-        </div>
-      )}
-
-      {/* Details */}
-      <section className="mb-8 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <h2 className="mb-6 font-sora text-lg font-extrabold text-purple-600">
-          Details
-        </h2>
-
-        <div className="flex flex-col gap-6">
-          <ImageUploadField
-            initialImageUrl={details.existingImageUrl}
-            onChange={(file) => updateDetail("image", file)}
-          />
-
-          <FormField
-            id="activityName"
-            label="Activity name"
-            placeholder="e.g. Beach Cleanup at Pantai Bagan"
-            value={details.name}
-            onChange={(e) => updateDetail("name", e.target.value)}
-            required
-          />
-
-          <TextAreaField
-            id="activityOverview"
-            label="Activity overview"
-            placeholder="Tell volunteers about this activity..."
-            value={details.overview}
-            onChange={(e) => updateDetail("overview", e.target.value)}
-            rows={3}
-          />
-
-          <TextAreaField
-            id="requirements"
-            label="General requirements"
-            placeholder="Anything volunteers should know or bring before joining? (e.g. comfortable shoes, own transport)"
-            value={details.requirements}
-            onChange={(e) => updateDetail("requirements", e.target.value)}
-            rows={3}
-          />
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              id="startsAt"
-              label="Starts"
-              type="datetime-local"
-              value={details.startsAt}
-              onChange={(e) => updateDetail("startsAt", e.target.value)}
-              required
-            />
-            <FormField
-              id="endsAt"
-              label="Ends"
-              type="datetime-local"
-              value={details.endsAt}
-              onChange={(e) => updateDetail("endsAt", e.target.value)}
-              min={details.startsAt || undefined}
-              required
-            />
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? isEditMode
+                  ? "Updating..."
+                  : "Publishing..."
+                : isEditMode
+                  ? "Update Activity"
+                  : "Publish Activity"}
+            </Button>
           </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              id="category"
-              label="Category"
-              placeholder="e.g. Environment, Elderly Care"
-              value={details.category}
-              onChange={(e) => updateDetail("category", e.target.value)}
-              required
-            />
-
-            <div className="flex flex-col gap-1.5">
-              <span className="font-inter text-sm font-medium text-purple-600/80">
-                Status
-              </span>
-              <div className="flex h-10.5 items-center">
-                <StatusBadge status={details.status} />
-              </div>
-              <p className="font-inter text-xs text-purple-600/50">
-                {isEditMode
-                  ? "You can update the status in the activity tracking page."
-                  : "New activities always start as upcoming."}
-              </p>
-            </div>
-          </div>
-
-          <ActivityTypeToggle
-            value={details.activityType}
-            onChange={(value) => updateDetail("activityType", value)}
-          />
-
-          {details.activityType === "online" ? (
-            <FormField
-              id="onlinePlatform"
-              label="Where's it happening online?"
-              placeholder="e.g. Zoom, Google Meet, MS Teams"
-              value={details.onlinePlatform}
-              onChange={(e) => updateDetail("onlinePlatform", e.target.value)}
-              required
-            />
-          ) : (
-            <LocationPicker
-              value={details.location}
-              onChange={(val) => updateDetail("location", val)}
-            />
-          )}
         </div>
-      </section>
 
-      {/* Tasks */}
-      <section className="mb-8 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="font-sora text-lg font-extrabold text-purple-600">
-            Tasks
+        {error && (
+          <div className="mb-6 rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
+            {error}
+          </div>
+        )}
+
+        {/* Details */}
+        <section className="mb-8 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
+          <h2 className="mb-6 font-sora text-lg font-extrabold text-purple-600">
+            Details
           </h2>
-          <span className="font-inter text-sm text-purple-600/60">
-            {totalCapacity} volunteer spot{totalCapacity === 1 ? "" : "s"} total
-          </span>
-        </div>
 
-        <div className="flex flex-col gap-4">
-          {tasks.map((task, index) => (
-            <TaskCard
-              key={task.id}
-              index={index}
-              task={task}
-              onChange={(next) => updateTask(task.id, next)}
-              onRemove={() => removeTask(task.id)}
+          <div className="flex flex-col gap-6">
+            <ImageUploadField
+              initialImageUrl={details.existingImageUrl}
+              onChange={(file) => updateDetail("image", file)}
             />
-          ))}
 
-          {tasks.length === 0 && (
-            <p className="font-inter text-sm text-purple-600/50">
-              No tasks yet. Add at least one so volunteers know what they'll be
-              doing.
-            </p>
-          )}
+            <FormField
+              id="activityName"
+              label="Activity name"
+              placeholder="e.g. Beach Cleanup at Pantai Bagan"
+              value={details.name}
+              onChange={(e) => updateDetail("name", e.target.value)}
+              required
+            />
 
-          <button
-            type="button"
-            onClick={addTask}
-            className="flex items-center justify-center gap-2 rounded-md border-2 border-dashed border-purple-600/25 py-3
-                       font-sora text-sm font-bold text-purple-600 transition-colors hover:bg-purple-50 cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            Add Task
-          </button>
-        </div>
-      </section>
+            <TextAreaField
+              id="activityOverview"
+              label="Activity overview"
+              placeholder="Tell volunteers about this activity..."
+              value={details.overview}
+              onChange={(e) => updateDetail("overview", e.target.value)}
+              rows={3}
+            />
 
-      <ConfirmModal
-        isOpen={showDeleteModal}
-        variant="danger"
-        title="Delete this activity?"
-        description="This can't be undone. The activity and all its tasks will be permanently removed."
-        confirmLabel="Delete Activity"
-        isLoading={isDeleting}
-        onConfirm={handleDelete}
-        onCancel={() => setShowDeleteModal(false)}
-      />
-    </form>
+            <TextAreaField
+              id="requirements"
+              label="General requirements"
+              placeholder="Anything volunteers should know or bring before joining? (e.g. comfortable shoes, own transport)"
+              value={details.requirements}
+              onChange={(e) => updateDetail("requirements", e.target.value)}
+              rows={3}
+            />
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                id="startsAt"
+                label="Starts"
+                type="datetime-local"
+                value={details.startsAt}
+                onChange={(e) => updateDetail("startsAt", e.target.value)}
+                required
+              />
+              <FormField
+                id="endsAt"
+                label="Ends"
+                type="datetime-local"
+                value={details.endsAt}
+                onChange={(e) => updateDetail("endsAt", e.target.value)}
+                min={details.startsAt || undefined}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                id="category"
+                label="Category"
+                placeholder="e.g. Environment, Elderly Care"
+                value={details.category}
+                onChange={(e) => updateDetail("category", e.target.value)}
+                required
+              />
+
+              <div className="flex flex-col gap-1.5">
+                <span className="font-inter text-sm font-medium text-purple-600/80">
+                  Status
+                </span>
+                <div className="flex h-10.5 items-center">
+                  <StatusBadge status={details.status} />
+                </div>
+                <p className="font-inter text-xs text-purple-600/50">
+                  {isEditMode
+                    ? "You can update the status in the activity tracking page."
+                    : "New activities always start as upcoming."}
+                </p>
+              </div>
+            </div>
+
+            <ActivityTypeToggle
+              value={details.activityType}
+              onChange={(value) => updateDetail("activityType", value)}
+            />
+
+            {details.activityType === "online" ? (
+              <FormField
+                id="onlinePlatform"
+                label="Where's it happening online?"
+                placeholder="e.g. Zoom, Google Meet, MS Teams"
+                value={details.onlinePlatform}
+                onChange={(e) => updateDetail("onlinePlatform", e.target.value)}
+                required
+              />
+            ) : (
+              <LocationPicker
+                value={details.location}
+                onChange={(val) => updateDetail("location", val)}
+              />
+            )}
+          </div>
+        </section>
+
+        {/* Tasks */}
+        <section className="mb-8 rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="font-sora text-lg font-extrabold text-purple-600">
+              Tasks
+            </h2>
+            <span className="font-inter text-sm text-purple-600/60">
+              {totalCapacity} volunteer spot{totalCapacity === 1 ? "" : "s"} total
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {tasks.map((task, index) => (
+              <TaskCard
+                key={task.id}
+                index={index}
+                task={task}
+                onChange={(next) => updateTask(task.id, next)}
+                onRemove={() => removeTask(task.id)}
+              />
+            ))}
+
+            {tasks.length === 0 && (
+              <p className="font-inter text-sm text-purple-600/50">
+                No tasks yet. Add at least one so volunteers know what they'll be
+                doing.
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={addTask}
+              className="flex items-center justify-center gap-2 rounded-md border-2 border-dashed border-purple-600/25 py-3
+                         font-sora text-sm font-bold text-purple-600 transition-colors hover:bg-purple-50 cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              Add Task
+            </button>
+          </div>
+        </section>
+
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          variant="danger"
+          title="Delete this activity?"
+          description="This can't be undone. The activity and all its tasks will be permanently removed."
+          confirmLabel="Delete Activity"
+          isLoading={isDeleting}
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      </form>
+    </div>
   );
 }

@@ -33,7 +33,7 @@ const emptyForm = {
 };
 
 // Helper Component for Dynamic Tag Inputs
-function TagInput({ label, tags, onAddTag, onRemoveTag, placeholder, colorTheme = "purple" }) {
+function TagInput({ label, tags, onAddTag, onRemoveTag, placeholder }) {
   const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (e) => {
@@ -54,10 +54,7 @@ function TagInput({ label, tags, onAddTag, onRemoveTag, placeholder, colorTheme 
     }
   };
 
-  const tagStyles =
-    colorTheme === "coral"
-      ? "bg-coral-50 text-coral-600 border-coral-200/60"
-      : "bg-purple-50 text-purple-600 border-purple-200/60";
+  const tagStyles = "bg-purple-50 text-purple-600 border-purple-200/60";
 
   return (
     <div>
@@ -238,9 +235,11 @@ export default function VolunteerProfileEdit() {
 
   if (loadingProfile) {
     return (
-      <p className="font-inter text-sm text-purple-600/60">
-        Loading profile...
-      </p>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <p className="font-inter text-sm text-purple-600/60">
+          Loading profile...
+        </p>
+      </div>
     );
   }
 
@@ -300,154 +299,156 @@ export default function VolunteerProfileEdit() {
   const fullName = [form.firstName, form.lastName].filter(Boolean).join(" ") || "Volunteer";
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-sora text-3xl font-extrabold text-purple-600">
-          Edit Profile
-        </h1>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => navigate(-1)}
-            variant="cancel"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
+    <div className="mx-auto max-w-4xl px-4 sm:px-6">
+      <form onSubmit={handleSubmit} className="w-full space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className="font-sora text-2xl sm:text-3xl font-extrabold text-purple-600">
+            Edit Profile
+          </h1>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => navigate(-1)}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {error && (
-        <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
-          {error}
-        </div>
-      )}
+        {error && (
+          <div className="rounded-md border border-coral-600/20 bg-coral-50 px-4 py-3 text-sm text-coral-600">
+            {error}
+          </div>
+        )}
 
-      {/* Basic Info */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <div className="mb-6 flex justify-center">
-          <AvatarUploadField
-            initialImageUrl={form.existingAvatarUrl}
-            name={fullName}
-            onChange={(file) => updateField("avatar", file)}
+        {/* Basic Info */}
+        <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="mb-6 flex justify-center">
+            <AvatarUploadField
+              initialImageUrl={form.existingAvatarUrl}
+              name={fullName}
+              onChange={(file) => updateField("avatar", file)}
+            />
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <FormField
+                id="firstName"
+                label="First name"
+                value={form.firstName}
+                onChange={(e) => updateField("firstName", e.target.value)}
+                required
+              />
+              <FormField
+                id="lastName"
+                label="Last name"
+                value={form.lastName}
+                onChange={(e) => updateField("lastName", e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <FormField
+                id="email"
+                label="Email address"
+                value={form.email}
+                disabled
+              />
+              <p className="mt-1 font-inter text-xs text-purple-600/50">
+                Email address cannot be changed directly.
+              </p>
+            </div>
+
+            <TextAreaField
+              id="bio"
+              label="Bio"
+              placeholder="Tell organizers and fellow volunteers about yourself..."
+              value={form.bio}
+              onChange={(e) => updateField("bio", e.target.value)}
+              rows={4}
+            />
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <FormField
+                id="contactNumber"
+                label="Contact number"
+                type="tel"
+                placeholder="e.g. +60 12-345 6789"
+                value={form.contactNumber}
+                onChange={(e) => updateField("contactNumber", e.target.value)}
+              />
+              <FormField
+                id="location"
+                label="Location / City"
+                placeholder="e.g. Kuala Lumpur, MY"
+                value={form.location}
+                onChange={(e) => updateField("location", e.target.value)}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Skills */}
+        <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="mb-4 flex items-center gap-2">
+            <Wrench className="h-5 w-5 text-purple-600" />
+            <h2 className="font-sora text-lg font-extrabold text-purple-600">
+              Skills
+            </h2>
+          </div>
+          <TagInput
+            label="Add your skills"
+            tags={form.skills}
+            onAddTag={handleAddSkill}
+            onRemoveTag={handleRemoveSkill}
+            placeholder="e.g. First Aid, Event Logistics, Teaching..."
+            colorTheme="purple"
           />
-        </div>
+        </section>
 
-        <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <FormField
-              id="firstName"
-              label="First name"
-              value={form.firstName}
-              onChange={(e) => updateField("firstName", e.target.value)}
-              required
-            />
-            <FormField
-              id="lastName"
-              label="Last name"
-              value={form.lastName}
-              onChange={(e) => updateField("lastName", e.target.value)}
-              required
-            />
+        {/* Interests */}
+        <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="mb-4 flex items-center gap-2">
+            <Heart className="h-5 w-5 text-purple-600" />
+            <h2 className="font-sora text-lg font-extrabold text-purple-600">
+              Interests & Causes
+            </h2>
           </div>
-
-          <div>
-            <FormField
-              id="email"
-              label="Email address"
-              value={form.email}
-              disabled
-            />
-            <p className="mt-1 font-inter text-xs text-purple-600/50">
-              Email address cannot be changed directly.
-            </p>
-          </div>
-
-          <TextAreaField
-            id="bio"
-            label="Bio"
-            placeholder="Tell organizers and fellow volunteers about yourself..."
-            value={form.bio}
-            onChange={(e) => updateField("bio", e.target.value)}
-            rows={4}
+          <TagInput
+            label="Add causes you care about"
+            tags={form.interests}
+            onAddTag={handleAddInterest}
+            onRemoveTag={handleRemoveInterest}
+            placeholder="e.g. Animal Welfare, Environment, Youth..."
+            colorTheme="coral"
           />
+        </section>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <FormField
-              id="contactNumber"
-              label="Contact number"
-              type="tel"
-              placeholder="e.g. +60 12-345 6789"
-              value={form.contactNumber}
-              onChange={(e) => updateField("contactNumber", e.target.value)}
-            />
-            <FormField
-              id="location"
-              label="Location / City"
-              placeholder="e.g. Kuala Lumpur, MY"
-              value={form.location}
-              onChange={(e) => updateField("location", e.target.value)}
-            />
+        {/* Availability */}
+        <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="mb-4 flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-purple-600" />
+            <h2 className="font-sora text-lg font-extrabold text-purple-600">
+              Weekly Availability
+            </h2>
           </div>
-        </div>
-      </section>
-
-      {/* Skills */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <div className="mb-4 flex items-center gap-2">
-          <Wrench className="h-5 w-5 text-purple-600" />
-          <h2 className="font-sora text-lg font-extrabold text-purple-600">
-            Skills
-          </h2>
-        </div>
-        <TagInput
-          label="Add your skills"
-          tags={form.skills}
-          onAddTag={handleAddSkill}
-          onRemoveTag={handleRemoveSkill}
-          placeholder="e.g. First Aid, Event Logistics, Teaching..."
-          colorTheme="purple"
-        />
-      </section>
-
-      {/* Interests */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <div className="mb-4 flex items-center gap-2">
-          <Heart className="h-5 w-5 text-purple-600" />
-          <h2 className="font-sora text-lg font-extrabold text-purple-600">
-            Interests & Causes
-          </h2>
-        </div>
-        <TagInput
-          label="Add causes you care about"
-          tags={form.interests}
-          onAddTag={handleAddInterest}
-          onRemoveTag={handleRemoveInterest}
-          placeholder="e.g. Animal Welfare, Environment, Youth..."
-          colorTheme="coral"
-        />
-      </section>
-
-      {/* Availability */}
-      <section className="rounded-2xl border border-purple-200/60 bg-white p-6 sm:p-8">
-        <div className="mb-4 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-purple-600" />
-          <h2 className="font-sora text-lg font-extrabold text-purple-600">
-            Weekly Availability
-          </h2>
-        </div>
-        <p className="mb-4 font-inter text-xs text-purple-600/70">
-          Check the days you are available and specify your preferred time slots.
-        </p>
-        <SchedulePicker
-          availability={form.availability}
-          onChange={(newAvailability) => updateField("availability", newAvailability)}
-        />
-      </section>
-    </form>
+          <p className="mb-4 font-inter text-xs text-purple-600/70">
+            Check the days you are available and specify your preferred time slots.
+          </p>
+          <SchedulePicker
+            availability={form.availability}
+            onChange={(newAvailability) => updateField("availability", newAvailability)}
+          />
+        </section>
+      </form>
+    </div>
   );
 }
